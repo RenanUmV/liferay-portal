@@ -28,7 +28,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author André de Oliveira
  */
-@Component(immediate = true, service = BulkReindexersHolder.class)
+@Component(service = BulkReindexersHolder.class)
 public class BulkReindexersHolderImpl implements BulkReindexersHolder {
 
 	@Override

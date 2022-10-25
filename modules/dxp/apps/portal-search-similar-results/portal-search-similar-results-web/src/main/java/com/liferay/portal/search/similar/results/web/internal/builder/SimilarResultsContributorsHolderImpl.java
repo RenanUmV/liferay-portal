@@ -29,7 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author André de Oliveira
  */
-@Component(immediate = true, service = SimilarResultsContributorsHolder.class)
+@Component(service = SimilarResultsContributorsHolder.class)
 public class SimilarResultsContributorsHolderImpl
 	implements SimilarResultsContributorsHolder {
 

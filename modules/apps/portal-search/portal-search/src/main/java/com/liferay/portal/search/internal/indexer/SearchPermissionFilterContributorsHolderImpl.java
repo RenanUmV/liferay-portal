@@ -29,9 +29,7 @@ import org.osgi.service.component.annotations.ReferencePolicyOption;
 /**
  * @author André de Oliveira
  */
-@Component(
-	immediate = true, service = SearchPermissionFilterContributorsHolder.class
-)
+@Component(service = SearchPermissionFilterContributorsHolder.class)
 public class SearchPermissionFilterContributorsHolderImpl
 	implements SearchPermissionFilterContributorsHolder {
 

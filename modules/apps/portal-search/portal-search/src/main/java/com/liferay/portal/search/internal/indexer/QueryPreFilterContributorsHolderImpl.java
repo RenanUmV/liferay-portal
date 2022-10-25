@@ -30,7 +30,7 @@ import org.osgi.service.component.annotations.Deactivate;
 /**
  * @author André de Oliveira
  */
-@Component(immediate = true, service = QueryPreFilterContributorsHolder.class)
+@Component(service = QueryPreFilterContributorsHolder.class)
 public class QueryPreFilterContributorsHolderImpl
 	implements QueryPreFilterContributorsHolder {
 

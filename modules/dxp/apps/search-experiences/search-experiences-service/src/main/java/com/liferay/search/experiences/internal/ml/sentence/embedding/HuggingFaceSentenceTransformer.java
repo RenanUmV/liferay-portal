@@ -44,7 +44,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.search.experiences.configuration.SemanticSearchConfiguration",
-	enabled = false, immediate = true,
+	enabled = false,
 	property = "search.experiences.sentence.transformer.name=huggingFace",
 	service = SentenceTransformer.class
 )

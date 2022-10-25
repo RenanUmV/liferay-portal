@@ -33,7 +33,6 @@ import org.osgi.service.component.annotations.Reference;
  * @author André de Oliveira
  */
 @Component(
-	immediate = true,
 	property = "search.request.contributor.id=com.liferay.portal.search.ranking",
 	service = SearchRequestContributor.class
 )
