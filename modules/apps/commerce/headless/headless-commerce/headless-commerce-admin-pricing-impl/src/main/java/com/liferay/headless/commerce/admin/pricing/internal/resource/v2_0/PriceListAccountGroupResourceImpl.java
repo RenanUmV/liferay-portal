@@ -258,9 +258,12 @@ public class PriceListAccountGroupResourceImpl
 	@Reference
 	private DTOConverterRegistry _dtoConverterRegistry;
 
-	@Reference
-	private PriceListAccountGroupDTOConverter
-		_priceListAccountGroupDTOConverter;
+	@Reference(
+		target = "(component.name=com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter.PriceListAccountGroupDTOConverter)"
+	)
+	private DTOConverter
+		<CommercePriceListCommerceAccountGroupRel, PriceListAccountGroup>
+			_priceListAccountGroupDTOConverter;
 
 	@Reference
 	private ServiceContextHelper _serviceContextHelper;
