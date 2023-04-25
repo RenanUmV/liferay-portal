@@ -19,15 +19,12 @@ import com.liferay.document.library.kernel.model.DLFileEntryType;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMap;
 import com.liferay.osgi.service.tracker.collections.map.ServiceTrackerMapFactory;
 
-import org.osgi.framework.BundleContext;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
 
 /**
  * @author Alejandro Tardín
  */
-@Component(service = {})
 public class DLFileEntryTypeIconProviderUtil {
 
 	public static String getIcon(DLFileEntryType fileEntryType) {
@@ -41,19 +38,16 @@ public class DLFileEntryTypeIconProviderUtil {
 		return "file-template";
 	}
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
+	private static final ServiceTrackerMap<String, DLFileEntryTypeIconProvider>
+		_serviceTrackerMap;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			DLFileEntryTypeIconProviderUtil.class);
+
 		_serviceTrackerMap = ServiceTrackerMapFactory.openSingleValueMap(
-			bundleContext, DLFileEntryTypeIconProvider.class,
+			bundle.getBundleContext(), DLFileEntryTypeIconProvider.class,
 			"file.entry.type.key");
 	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceTrackerMap.close();
-	}
-
-	private static ServiceTrackerMap<String, DLFileEntryTypeIconProvider>
-		_serviceTrackerMap;
 
 }

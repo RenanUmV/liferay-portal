@@ -15,39 +15,23 @@
 package com.liferay.item.selector.taglib.internal.servlet.item.selector;
 
 import com.liferay.item.selector.ItemSelector;
-
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
+import com.liferay.osgi.util.service.Snapshot;
 
 /**
  * @author Roberto Díaz
  */
-@Component(service = {})
 public class ItemSelectorUtil {
 
 	public static ItemSelector getItemSelector() {
 		return _itemSelectorUtil._getItemSelector();
 	}
 
-	@Activate
-	protected void activate() {
-		_itemSelectorUtil = this;
-	}
-
-	@Deactivate
-	protected void deactivate() {
-		_itemSelectorUtil = null;
-	}
-
 	private ItemSelector _getItemSelector() {
-		return _itemSelector;
+		return _itemSelectorSnapshot.get();
 	}
 
+	private static final Snapshot<ItemSelector> _itemSelectorSnapshot =
+		new Snapshot<>(ItemSelectorUtil.class, ItemSelector.class);
 	private static ItemSelectorUtil _itemSelectorUtil;
-
-	@Reference
-	private ItemSelector _itemSelector;
 
 }
