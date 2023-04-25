@@ -14,14 +14,15 @@
 
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
-import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
+import com.liferay.list.type.service.ListTypeDefinitionService;
+import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.scope.ObjectScopeProviderRegistry;
-import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectFieldSettingLocalService;
 import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsDetailsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsFieldsDisplayContext;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -40,13 +41,13 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsDetailsScreenNavigationEntry
+public class FieldsObjectDefinitionsScreenNavigationEntry
 	extends BaseObjectDefinitionsScreenNavigationEntry {
 
 	@Override
 	public String getCategoryKey() {
 		return ObjectDefinitionsScreenNavigationEntryConstants.
-			CATEGORY_KEY_DETAILS;
+			CATEGORY_KEY_FIELDS;
 	}
 
 	@Override
@@ -56,7 +57,12 @@ public class ObjectDefinitionsDetailsScreenNavigationEntry
 
 	@Override
 	public String getJspPath() {
-		return "/object_definitions/object_definition/details.jsp";
+		return "/object_definitions/object_definition/fields.jsp";
+	}
+
+	@Override
+	public boolean isVisible(User user, ObjectDefinition context) {
+		return super.isVisible(user, context);
 	}
 
 	@Override
@@ -67,17 +73,18 @@ public class ObjectDefinitionsDetailsScreenNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsDetailsDisplayContext(
-				httpServletRequest, _objectDefinitionLocalService,
+			new ObjectDefinitionsFieldsDisplayContext(
+				httpServletRequest, _listTypeDefinitionService,
 				_objectDefinitionModelResourcePermission,
-				_objectRelationshipLocalService, _objectScopeProviderRegistry,
-				_panelCategoryRegistry));
+				_objectFieldBusinessTypeRegistry,
+				_objectFieldSettingLocalService,
+				_objectRelationshipLocalService));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
 
 	@Reference
-	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+	private ListTypeDefinitionService _listTypeDefinitionService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
@@ -86,12 +93,12 @@ public class ObjectDefinitionsDetailsScreenNavigationEntry
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
+	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
+
+	@Reference
+	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+
+	@Reference
 	private ObjectRelationshipLocalService _objectRelationshipLocalService;
-
-	@Reference
-	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
-
-	@Reference
-	private PanelCategoryRegistry _panelCategoryRegistry;
 
 }

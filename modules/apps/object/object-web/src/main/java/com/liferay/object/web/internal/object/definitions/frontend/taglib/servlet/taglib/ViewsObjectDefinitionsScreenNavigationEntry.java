@@ -15,10 +15,10 @@
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
-import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
-import com.liferay.object.web.internal.object.definitions.display.context.ViewObjectDefinitionsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsViewsDisplayContext;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -37,13 +37,28 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsObjectsScreenNavigationEntry
-	extends ObjectDefinitionsObjectsScreenNavigationCategory
-	implements ScreenNavigationEntry<ObjectDefinition> {
+public class ViewsObjectDefinitionsScreenNavigationEntry
+	extends BaseObjectDefinitionsScreenNavigationEntry {
+
+	@Override
+	public String getCategoryKey() {
+		return ObjectDefinitionsScreenNavigationEntryConstants.
+			CATEGORY_KEY_VIEWS;
+	}
 
 	@Override
 	public String getEntryKey() {
 		return getCategoryKey();
+	}
+
+	@Override
+	public String getJspPath() {
+		return "/object_definitions/object_definition/views.jsp";
+	}
+
+	@Override
+	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
+		return !objectDefinition.isUnmodifiableSystemObject();
 	}
 
 	@Override
@@ -54,25 +69,16 @@ public class ObjectDefinitionsObjectsScreenNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ViewObjectDefinitionsDisplayContext(
-				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectEntryManagerRegistry));
+			new ObjectDefinitionsViewsDisplayContext(
+				httpServletRequest, _objectDefinitionModelResourcePermission));
 
-		_jspRenderer.renderJSP(
-			httpServletRequest, httpServletResponse,
-			"/object_definitions/view_object_definitions.jsp");
+		super.render(httpServletRequest, httpServletResponse);
 	}
-
-	@Reference
-	private JSPRenderer _jspRenderer;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
 	)
 	private ModelResourcePermission<ObjectDefinition>
 		_objectDefinitionModelResourcePermission;
-
-	@Reference
-	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 }

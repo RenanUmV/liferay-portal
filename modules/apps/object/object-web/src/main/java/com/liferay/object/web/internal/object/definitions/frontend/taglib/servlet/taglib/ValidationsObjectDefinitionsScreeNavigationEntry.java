@@ -15,13 +15,10 @@
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
-import com.liferay.list.type.service.ListTypeDefinitionService;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
-import com.liferay.object.service.ObjectRelationshipLocalService;
+import com.liferay.object.validation.rule.ObjectValidationRuleEngineRegistry;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsFieldsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContext;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -41,13 +38,13 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsFieldsScreenNavigationEntry
+public class ValidationsObjectDefinitionsScreeNavigationEntry
 	extends BaseObjectDefinitionsScreenNavigationEntry {
 
 	@Override
 	public String getCategoryKey() {
 		return ObjectDefinitionsScreenNavigationEntryConstants.
-			CATEGORY_KEY_FIELDS;
+			CATEGORY_KEY_VALIDATIONS;
 	}
 
 	@Override
@@ -57,12 +54,12 @@ public class ObjectDefinitionsFieldsScreenNavigationEntry
 
 	@Override
 	public String getJspPath() {
-		return "/object_definitions/object_definition/fields.jsp";
+		return "/object_definitions/object_definition/validations.jsp";
 	}
 
 	@Override
-	public boolean isVisible(User user, ObjectDefinition context) {
-		return super.isVisible(user, context);
+	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
+		return objectDefinition.isDefaultStorageType();
 	}
 
 	@Override
@@ -73,18 +70,12 @@ public class ObjectDefinitionsFieldsScreenNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsFieldsDisplayContext(
-				httpServletRequest, _listTypeDefinitionService,
-				_objectDefinitionModelResourcePermission,
-				_objectFieldBusinessTypeRegistry,
-				_objectFieldSettingLocalService,
-				_objectRelationshipLocalService));
+			new ObjectDefinitionsValidationsDisplayContext(
+				httpServletRequest, _objectDefinitionModelResourcePermission,
+				_objectValidationRuleEngineRegistry));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
-
-	@Reference
-	private ListTypeDefinitionService _listTypeDefinitionService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
@@ -93,12 +84,7 @@ public class ObjectDefinitionsFieldsScreenNavigationEntry
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
-
-	@Reference
-	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
-
-	@Reference
-	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+	private ObjectValidationRuleEngineRegistry
+		_objectValidationRuleEngineRegistry;
 
 }

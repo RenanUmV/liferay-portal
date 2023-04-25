@@ -15,10 +15,13 @@
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
-import com.liferay.object.field.business.type.ObjectFieldBusinessTypeRegistry;
 import com.liferay.object.model.ObjectDefinition;
+import com.liferay.object.service.ObjectDefinitionService;
+import com.liferay.object.service.ObjectFieldService;
+import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
+import com.liferay.object.web.internal.configuration.activator.FFOneToOneRelationshipConfigurationActivator;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsLayoutsDisplayContext;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsRelationshipsDisplayContext;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
@@ -38,13 +41,13 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsLayoutsScreenNavigationEntry
+public class RelationshipsObjectDefinitionsScreenNavigationEntry
 	extends BaseObjectDefinitionsScreenNavigationEntry {
 
 	@Override
 	public String getCategoryKey() {
 		return ObjectDefinitionsScreenNavigationEntryConstants.
-			CATEGORY_KEY_LAYOUTS;
+			CATEGORY_KEY_RELATIONSHIPS;
 	}
 
 	@Override
@@ -54,18 +57,12 @@ public class ObjectDefinitionsLayoutsScreenNavigationEntry
 
 	@Override
 	public String getJspPath() {
-		return "/object_definitions/object_definition/layouts.jsp";
-	}
-
-	@Override
-	public String getScreenNavigationKey() {
-		return ObjectDefinitionsScreenNavigationEntryConstants.
-			SCREEN_NAVIGATION_KEY_OBJECT_DEFINITION;
+		return "/object_definitions/object_definition/relationships.jsp";
 	}
 
 	@Override
 	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
-		return !objectDefinition.isUnmodifiableSystemObject();
+		return objectDefinition.isDefaultStorageType();
 	}
 
 	@Override
@@ -76,12 +73,18 @@ public class ObjectDefinitionsLayoutsScreenNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsLayoutsDisplayContext(
+			new ObjectDefinitionsRelationshipsDisplayContext(
+				_ffOneToOneRelationshipConfigurationActivator,
 				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectFieldBusinessTypeRegistry));
+				_objectDefinitionService, _objectFieldService,
+				_systemObjectDefinitionManagerRegistry));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
+
+	@Reference
+	private FFOneToOneRelationshipConfigurationActivator
+		_ffOneToOneRelationshipConfigurationActivator;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
@@ -90,6 +93,13 @@ public class ObjectDefinitionsLayoutsScreenNavigationEntry
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectFieldBusinessTypeRegistry _objectFieldBusinessTypeRegistry;
+	private ObjectDefinitionService _objectDefinitionService;
+
+	@Reference
+	private ObjectFieldService _objectFieldService;
+
+	@Reference
+	private SystemObjectDefinitionManagerRegistry
+		_systemObjectDefinitionManagerRegistry;
 
 }

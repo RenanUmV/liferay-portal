@@ -14,12 +14,14 @@
 
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
+import com.liferay.application.list.PanelCategoryRegistry;
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.validation.rule.ObjectValidationRuleEngineRegistry;
+import com.liferay.object.scope.ObjectScopeProviderRegistry;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectRelationshipLocalService;
 import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsValidationsDisplayContext;
-import com.liferay.portal.kernel.model.User;
+import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsDetailsDisplayContext;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -38,13 +40,13 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsValidationsScreeNavigationEntry
+public class DetailsObjectDefinitionsScreenNavigationEntry
 	extends BaseObjectDefinitionsScreenNavigationEntry {
 
 	@Override
 	public String getCategoryKey() {
 		return ObjectDefinitionsScreenNavigationEntryConstants.
-			CATEGORY_KEY_VALIDATIONS;
+			CATEGORY_KEY_DETAILS;
 	}
 
 	@Override
@@ -54,12 +56,7 @@ public class ObjectDefinitionsValidationsScreeNavigationEntry
 
 	@Override
 	public String getJspPath() {
-		return "/object_definitions/object_definition/validations.jsp";
-	}
-
-	@Override
-	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
-		return objectDefinition.isDefaultStorageType();
+		return "/object_definitions/object_definition/details.jsp";
 	}
 
 	@Override
@@ -70,12 +67,17 @@ public class ObjectDefinitionsValidationsScreeNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsValidationsDisplayContext(
-				httpServletRequest, _objectDefinitionModelResourcePermission,
-				_objectValidationRuleEngineRegistry));
+			new ObjectDefinitionsDetailsDisplayContext(
+				httpServletRequest, _objectDefinitionLocalService,
+				_objectDefinitionModelResourcePermission,
+				_objectRelationshipLocalService, _objectScopeProviderRegistry,
+				_panelCategoryRegistry));
 
 		super.render(httpServletRequest, httpServletResponse);
 	}
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
@@ -84,7 +86,12 @@ public class ObjectDefinitionsValidationsScreeNavigationEntry
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectValidationRuleEngineRegistry
-		_objectValidationRuleEngineRegistry;
+	private ObjectRelationshipLocalService _objectRelationshipLocalService;
+
+	@Reference
+	private ObjectScopeProviderRegistry _objectScopeProviderRegistry;
+
+	@Reference
+	private PanelCategoryRegistry _panelCategoryRegistry;
 
 }

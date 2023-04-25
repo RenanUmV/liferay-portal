@@ -15,12 +15,10 @@
 package com.liferay.object.web.internal.object.definitions.frontend.taglib.servlet.taglib;
 
 import com.liferay.frontend.taglib.servlet.taglib.ScreenNavigationEntry;
-import com.liferay.list.type.service.ListTypeDefinitionService;
+import com.liferay.frontend.taglib.servlet.taglib.util.JSPRenderer;
 import com.liferay.object.model.ObjectDefinition;
-import com.liferay.object.service.ObjectFieldSettingLocalService;
-import com.liferay.object.web.internal.object.definitions.constants.ObjectDefinitionsScreenNavigationEntryConstants;
-import com.liferay.object.web.internal.object.definitions.display.context.ObjectDefinitionsStateManagerDisplayContext;
-import com.liferay.portal.kernel.model.User;
+import com.liferay.object.rest.manager.v1_0.ObjectEntryManagerRegistry;
+import com.liferay.object.web.internal.object.definitions.display.context.ViewObjectDefinitionsDisplayContext;
 import com.liferay.portal.kernel.security.permission.resource.ModelResourcePermission;
 import com.liferay.portal.kernel.util.WebKeys;
 
@@ -39,28 +37,13 @@ import org.osgi.service.component.annotations.Reference;
 	property = "screen.navigation.entry.order:Integer=10",
 	service = ScreenNavigationEntry.class
 )
-public class ObjectDefinitionsStatesScreenNavigationEntry
-	extends BaseObjectDefinitionsScreenNavigationEntry {
-
-	@Override
-	public String getCategoryKey() {
-		return ObjectDefinitionsScreenNavigationEntryConstants.
-			CATEGORY_KEY_STATE_MANAGER;
-	}
+public class ObjectsObjectDefinitionsScreenNavigationEntry
+	extends ObjectsObjectDefinitionsScreenNavigationCategory
+	implements ScreenNavigationEntry<ObjectDefinition> {
 
 	@Override
 	public String getEntryKey() {
 		return getCategoryKey();
-	}
-
-	@Override
-	public String getJspPath() {
-		return "/object_definitions/object_definition/states.jsp";
-	}
-
-	@Override
-	public boolean isVisible(User user, ObjectDefinition objectDefinition) {
-		return !objectDefinition.isUnmodifiableSystemObject();
 	}
 
 	@Override
@@ -71,16 +54,17 @@ public class ObjectDefinitionsStatesScreenNavigationEntry
 
 		httpServletRequest.setAttribute(
 			WebKeys.PORTLET_DISPLAY_CONTEXT,
-			new ObjectDefinitionsStateManagerDisplayContext(
-				httpServletRequest, _listTypeDefinitionService,
-				_objectDefinitionModelResourcePermission,
-				_objectFieldSettingLocalService));
+			new ViewObjectDefinitionsDisplayContext(
+				httpServletRequest, _objectDefinitionModelResourcePermission,
+				_objectEntryManagerRegistry));
 
-		super.render(httpServletRequest, httpServletResponse);
+		_jspRenderer.renderJSP(
+			httpServletRequest, httpServletResponse,
+			"/object_definitions/view_object_definitions.jsp");
 	}
 
 	@Reference
-	private ListTypeDefinitionService _listTypeDefinitionService;
+	private JSPRenderer _jspRenderer;
 
 	@Reference(
 		target = "(model.class.name=com.liferay.object.model.ObjectDefinition)"
@@ -89,6 +73,6 @@ public class ObjectDefinitionsStatesScreenNavigationEntry
 		_objectDefinitionModelResourcePermission;
 
 	@Reference
-	private ObjectFieldSettingLocalService _objectFieldSettingLocalService;
+	private ObjectEntryManagerRegistry _objectEntryManagerRegistry;
 
 }
