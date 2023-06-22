@@ -48,8 +48,8 @@ import org.osgi.service.component.annotations.Component;
 		"ignore.missing.scopes=HEAD", "ignore.missing.scopes=OPTIONS",
 		"oauth2.scope.checker.type=http.method"
 	},
-	service = {HttpMethodScopeLogic.class, ScopeLogic.class}
-)
+	service = ScopeLogic.class)
+
 public class HttpMethodScopeLogic implements ScopeLogic {
 
 	@Override
