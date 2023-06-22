@@ -84,6 +84,14 @@ public class DataDefinitionTestUtil {
 			groupId, "test", dataDefinition);
 	}
 
+	public static boolean getAllowEmptyDataDefinition() {
+		return _allowEmptyDataDefinition;
+	}
+
+	public static void setAllowEmptyDataDefinition(boolean allowEmptyDataDefinition) {
+		_allowEmptyDataDefinition = allowEmptyDataDefinition;
+	}
+
 	public static DataDefinition addDataDefinitionWithFieldset(long groupId)
 		throws Exception {
 
@@ -189,5 +197,7 @@ public class DataDefinitionTestUtil {
 
 		return dataDefinition;
 	}
+
+	private static boolean _allowEmptyDataDefinition = true;
 
 }
