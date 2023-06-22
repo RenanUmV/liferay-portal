@@ -37,11 +37,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Chema Balsas
  */
-@Component(
-	service = {
-		DynamicInclude.class, StagingBarControlMenuJSPDynamicInclude.class
-	}
-)
+@Component(service = DynamicInclude.class)
+
 public class StagingBarControlMenuJSPDynamicInclude
 	extends BaseJSPDynamicInclude {
 
