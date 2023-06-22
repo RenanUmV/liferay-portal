@@ -15,6 +15,7 @@
 package com.liferay.data.engine.rest.resource.v2_0.test.util.content.type;
 
 import com.liferay.data.engine.content.type.DataDefinitionContentType;
+import com.liferay.data.engine.rest.resource.v2_0.test.util.DataDefinitionTestUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.util.Portal;
@@ -27,16 +28,15 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	property = "content.type=test",
-	service = {
-		DataDefinitionContentType.class, TestDataDefinitionContentType.class
-	}
+	service = DataDefinitionContentType.class
 )
+
 public class TestDataDefinitionContentType
 	implements DataDefinitionContentType {
 
 	@Override
 	public boolean allowEmptyDataDefinition() {
-		return _allowEmptyDataDefinition;
+		return DataDefinitionTestUtil.getAllowEmptyDataDefinition();
 	}
 
 	@Override
@@ -85,12 +85,6 @@ public class TestDataDefinitionContentType
 	public boolean isDataRecordCollectionPermissionCheckingEnabled() {
 		return true;
 	}
-
-	public void setAllowEmptyDataDefinition(boolean allowEmptyDataDefinition) {
-		_allowEmptyDataDefinition = allowEmptyDataDefinition;
-	}
-
-	private boolean _allowEmptyDataDefinition = true;
 
 	@Reference
 	private Portal _portal;
