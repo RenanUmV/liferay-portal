@@ -111,7 +111,7 @@ public class StagingBarTemplateContextContributor
 	@Reference
 	private Language _language;
 
-	@Reference
+	@Reference(target = "(component.name=com.liferay.staging.bar.web.internal.servlet.taglib.ui.StagingBarControlMenuJSPDynamicInclude)")
 	private StagingBarControlMenuJSPDynamicInclude
 		_stagingBarControlMenuJSPDynamicInclude;
 
