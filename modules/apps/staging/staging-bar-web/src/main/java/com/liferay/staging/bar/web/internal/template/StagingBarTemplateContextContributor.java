@@ -21,6 +21,7 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.servlet.taglib.DynamicInclude;
 import com.liferay.portal.kernel.template.TemplateContextContributor;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -33,6 +34,7 @@ import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.liferay.staging.bar.web.internal.util.StagingBarControlMenuJSPDynamicIncludeUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -56,7 +58,7 @@ public class StagingBarTemplateContextContributor
 				WebKeys.THEME_DISPLAY);
 
 		try {
-			if (_stagingBarControlMenuJSPDynamicInclude.isShow(
+			if (StagingBarControlMenuJSPDynamicIncludeUtil.isShow(
 					httpServletRequest)) {
 
 				StringBundler sb = new StringBundler(3);
@@ -112,7 +114,5 @@ public class StagingBarTemplateContextContributor
 	private Language _language;
 
 	@Reference(target = "(component.name=com.liferay.staging.bar.web.internal.servlet.taglib.ui.StagingBarControlMenuJSPDynamicInclude)")
-	private StagingBarControlMenuJSPDynamicInclude
-		_stagingBarControlMenuJSPDynamicInclude;
-
+	private DynamicInclude _stagingBarControlMenuJSPDynamicInclude;
 }
