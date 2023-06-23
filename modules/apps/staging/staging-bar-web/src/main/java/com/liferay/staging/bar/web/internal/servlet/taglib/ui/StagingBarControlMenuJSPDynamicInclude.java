@@ -31,8 +31,11 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.liferay.staging.bar.web.internal.util.StagingBarControlMenuJSPDynamicIncludeUtil;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+
+import static com.liferay.staging.bar.web.internal.util.StagingBarControlMenuJSPDynamicIncludeUtil.isShow;
 
 /**
  * @author Chema Balsas
@@ -67,22 +70,6 @@ public class StagingBarControlMenuJSPDynamicInclude
 		super.include(httpServletRequest, httpServletResponse, key);
 	}
 
-	public boolean isShow(HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		Boolean show = (Boolean)httpServletRequest.getAttribute(_SHOW);
-
-		if (show != null) {
-			return show;
-		}
-
-		show = _isShow(httpServletRequest);
-
-		httpServletRequest.setAttribute(_SHOW, show);
-
-		return show;
-	}
-
 	@Override
 	public void register(DynamicIncludeRegistry dynamicIncludeRegistry) {
 		dynamicIncludeRegistry.register(
@@ -99,28 +86,6 @@ public class StagingBarControlMenuJSPDynamicInclude
 		return _log;
 	}
 
-	private boolean _isShow(HttpServletRequest httpServletRequest)
-		throws PortalException {
-
-		ThemeDisplay themeDisplay =
-			(ThemeDisplay)httpServletRequest.getAttribute(
-				WebKeys.THEME_DISPLAY);
-
-		Layout layout = themeDisplay.getLayout();
-
-		if (layout.isTypeControlPanel() || !themeDisplay.isShowStagingIcon()) {
-			return false;
-		}
-
-		String layoutMode = ParamUtil.getString(
-			httpServletRequest, "p_l_mode", Constants.VIEW);
-
-		if (layoutMode.equals(Constants.EDIT)) {
-			return false;
-		}
-
-		return true;
-	}
 
 	private static final String _SHOW =
 		StagingBarControlMenuJSPDynamicInclude.class + "#_SHOW";
