@@ -14,7 +14,7 @@
 
 package com.liferay.oauth2.provider.rest.internal.endpoint.access.token.authentication.handler;
 
-import com.liferay.oauth2.provider.rest.internal.configuration.admin.service.OAuth2InAssertionManagedServiceFactory;
+import com.liferay.oauth2.provider.rest.internal.endpoint.access.token.grant.handler.LiferayJWTBearerGrantHandler;
 import com.liferay.oauth2.provider.rest.internal.endpoint.liferay.LiferayOAuthDataProvider;
 import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 
@@ -69,10 +69,8 @@ public class LiferayJWTBearerAuthenticationHandlerRegistrator {
 	@Reference
 	private LiferayOAuthDataProvider _liferayOAuthDataProvider;
 
-	@Reference
-	private OAuth2InAssertionManagedServiceFactory
+	private LiferayJWTBearerGrantHandler
 		_oAuth2InAssertionManagedServiceFactory;
-
 	private volatile ServiceRegistration<ContainerRequestFilter>
 		_serviceRegistration;
 
