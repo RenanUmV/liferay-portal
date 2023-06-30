@@ -15,7 +15,7 @@
 package com.liferay.fragment.web.internal.configuration.display;
 
 import com.liferay.configuration.admin.display.ConfigurationScreen;
-import com.liferay.fragment.web.internal.configuration.admin.service.FragmentServiceManagedServiceFactory;
+import com.liferay.fragment.web.internal.configuration.admin.service.FragmentConfigurationHelper;
 import com.liferay.fragment.web.internal.display.context.FragmentServiceConfigurationDisplayContext;
 import com.liferay.portal.kernel.language.Language;
 import com.liferay.portal.kernel.util.JavaConstants;
@@ -69,7 +69,7 @@ public abstract class BaseFragmentServiceConfigurationScreen
 					portal.getLiferayPortletResponse(
 						(PortletResponse)httpServletRequest.getAttribute(
 							JavaConstants.JAVAX_PORTLET_RESPONSE)),
-					fragmentServiceManagedServiceFactory, getScope()));
+					fragmentConfigurationHelper, getScope()));
 
 			RequestDispatcher requestDispatcher =
 				servletContext.getRequestDispatcher(
@@ -85,8 +85,7 @@ public abstract class BaseFragmentServiceConfigurationScreen
 	}
 
 	@Reference
-	protected FragmentServiceManagedServiceFactory
-		fragmentServiceManagedServiceFactory;
+	protected FragmentConfigurationHelper fragmentConfigurationHelper;
 
 	@Reference
 	protected Language language;

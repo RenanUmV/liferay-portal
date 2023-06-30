@@ -19,7 +19,7 @@ import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.model.FragmentEntry;
 import com.liferay.fragment.model.FragmentEntryLink;
 import com.liferay.fragment.service.FragmentEntryLinkLocalService;
-import com.liferay.fragment.web.internal.configuration.admin.service.FragmentServiceManagedServiceFactory;
+import com.liferay.fragment.web.internal.configuration.admin.service.FragmentConfigurationHelper;
 import com.liferay.portal.configuration.metatype.annotations.ExtendedObjectClassDefinition;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.Property;
@@ -157,7 +157,7 @@ public class PropagateContributedFragmentEntriesChangesMVCActionCommand
 		boolean propagateContributedFragmentChanges = ParamUtil.getBoolean(
 			actionRequest, "propagateContributedFragmentChanges");
 
-		_fragmentServiceManagedServiceFactory.updatePropagateChanges(
+		_fragmentConfigurationHelper.updatePropagateChanges(
 			propagateChanges, propagateContributedFragmentChanges, scope,
 			scopePK);
 	}
@@ -190,11 +190,10 @@ public class PropagateContributedFragmentEntriesChangesMVCActionCommand
 		_fragmentCollectionContributorRegistry;
 
 	@Reference
-	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
+	private FragmentConfigurationHelper _fragmentConfigurationHelper;
 
 	@Reference
-	private FragmentServiceManagedServiceFactory
-		_fragmentServiceManagedServiceFactory;
+	private FragmentEntryLinkLocalService _fragmentEntryLinkLocalService;
 
 	@Reference
 	private JSONFactory _jsonFactory;
