@@ -15,7 +15,7 @@
 package com.liferay.document.library.internal.configuration.persistence.listener;
 
 import com.liferay.document.library.internal.configuration.DLSizeLimitConfiguration;
-import com.liferay.document.library.internal.configuration.admin.service.DLSizeLimitManagedServiceFactory;
+import com.liferay.document.library.internal.configuration.admin.service.DLSizeLimitHelper;
 import com.liferay.document.library.internal.util.MimeTypeSizeLimitUtil;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListener;
 import com.liferay.portal.configuration.persistence.listener.ConfigurationModelListenerException;
@@ -73,12 +73,12 @@ public class DLSizeLimitConfigurationModelListener
 	}
 
 	protected void setDLSizeLimitManagedServiceFactory(
-		DLSizeLimitManagedServiceFactory dlSizeLimitManagedServiceFactory) {
+		DLSizeLimitHelper dlSizeLimitHelper) {
 
-		_dlSizeLimitManagedServiceFactory = dlSizeLimitManagedServiceFactory;
+		_dlSizeLimitHelper = dlSizeLimitHelper;
 	}
 
 	@Reference
-	private DLSizeLimitManagedServiceFactory _dlSizeLimitManagedServiceFactory;
+	private DLSizeLimitHelper _dlSizeLimitHelper;
 
 }

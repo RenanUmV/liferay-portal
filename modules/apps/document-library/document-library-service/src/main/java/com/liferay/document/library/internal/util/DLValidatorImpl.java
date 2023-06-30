@@ -15,7 +15,7 @@
 package com.liferay.document.library.internal.util;
 
 import com.liferay.document.library.configuration.DLConfiguration;
-import com.liferay.document.library.internal.configuration.admin.service.DLSizeLimitManagedServiceFactory;
+import com.liferay.document.library.internal.configuration.admin.service.DLSizeLimitHelper;
 import com.liferay.document.library.kernel.exception.FileExtensionException;
 import com.liferay.document.library.kernel.exception.FileNameException;
 import com.liferay.document.library.kernel.exception.FileSizeException;
@@ -85,20 +85,19 @@ public final class DLValidatorImpl implements DLValidator {
 		return _min(
 			_getGlobalMaxAllowableSize(companyId, groupId),
 			_min(
-				_dlSizeLimitManagedServiceFactory.getCompanyMimeTypeSizeLimit(
+				_dlSizeLimitHelper.getCompanyMimeTypeSizeLimit(
 					companyId, mimeType),
-				_dlSizeLimitManagedServiceFactory.getGroupMimeTypeSizeLimit(
+				_dlSizeLimitHelper.getGroupMimeTypeSizeLimit(
 					groupId, mimeType)));
 	}
 
 	@Override
 	public Map<String, Long> getMimeTypeSizeLimit(long groupId) {
 		Map<String, Long> mimeTypeSizeLimit = new HashMap<>(
-			_dlSizeLimitManagedServiceFactory.getGroupMimeTypeSizeLimit(
-				groupId));
+			_dlSizeLimitHelper.getGroupMimeTypeSizeLimit(groupId));
 
 		Map<String, Long> companyMimeTypeSizeLimit =
-			_dlSizeLimitManagedServiceFactory.getCompanyMimeTypeSizeLimit(
+			_dlSizeLimitHelper.getCompanyMimeTypeSizeLimit(
 				_getCompanyId(groupId));
 
 		companyMimeTypeSizeLimit.forEach(
@@ -309,9 +308,9 @@ public final class DLValidatorImpl implements DLValidator {
 	}
 
 	protected void setDLSizeLimitManagedServiceFactory(
-		DLSizeLimitManagedServiceFactory dlSizeLimitManagedServiceFactory) {
+		DLSizeLimitHelper dlSizeLimitHelper) {
 
-		_dlSizeLimitManagedServiceFactory = dlSizeLimitManagedServiceFactory;
+		_dlSizeLimitHelper = dlSizeLimitHelper;
 	}
 
 	protected void setGroupLocalService(GroupLocalService groupLocalService) {
@@ -340,10 +339,8 @@ public final class DLValidatorImpl implements DLValidator {
 		return _min(
 			_uploadServletRequestConfigurationProvider.getMaxSize(),
 			_min(
-				_dlSizeLimitManagedServiceFactory.getCompanyFileMaxSize(
-					companyId),
-				_dlSizeLimitManagedServiceFactory.getGroupFileMaxSize(
-					groupId)));
+				_dlSizeLimitHelper.getCompanyFileMaxSize(companyId),
+				_dlSizeLimitHelper.getGroupFileMaxSize(groupId)));
 	}
 
 	private long _min(long a, long b) {
@@ -414,7 +411,7 @@ public final class DLValidatorImpl implements DLValidator {
 	private volatile DLConfiguration _dlConfiguration;
 
 	@Reference
-	private DLSizeLimitManagedServiceFactory _dlSizeLimitManagedServiceFactory;
+	private DLSizeLimitHelper _dlSizeLimitHelper;
 
 	@Reference
 	private GroupLocalService _groupLocalService;

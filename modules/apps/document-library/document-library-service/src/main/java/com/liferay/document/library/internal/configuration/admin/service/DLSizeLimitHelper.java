@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.model.GroupConstants;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HashMapDictionaryBuilder;
 import com.liferay.portal.kernel.util.Validator;
 
 import java.util.Dictionary;
@@ -34,11 +35,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
+import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedServiceFactory;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 
@@ -47,17 +51,9 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.document.library.internal.configuration.DLSizeLimitConfiguration",
-	property = Constants.SERVICE_PID + "=com.liferay.document.library.internal.configuration.DLSizeLimitConfiguration.scoped",
-	service = {
-		DLSizeLimitManagedServiceFactory.class, ManagedServiceFactory.class
-	}
+	service = DLSizeLimitHelper.class
 )
-public class DLSizeLimitManagedServiceFactory implements ManagedServiceFactory {
-
-	@Override
-	public void deleted(String pid) {
-		_unmapPid(pid);
-	}
+public class DLSizeLimitHelper {
 
 	public long getCompanyFileMaxSize(long companyId) {
 		DLSizeLimitConfiguration dlSizeLimitConfiguration =
@@ -135,12 +131,6 @@ public class DLSizeLimitManagedServiceFactory implements ManagedServiceFactory {
 		return map.getOrDefault(String.format("%s/*", parts.get(0)), 0L);
 	}
 
-	@Override
-	public String getName() {
-		return "com.liferay.document.library.internal.configuration." +
-			"DLSizeLimitConfiguration.scoped";
-	}
-
 	public long getSystemFileMaxSize() {
 		return _systemDLSizeLimitConfiguration.fileMaxSize();
 	}
@@ -153,30 +143,28 @@ public class DLSizeLimitManagedServiceFactory implements ManagedServiceFactory {
 		return _computeMimeTypeSizeLimit(_systemDLSizeLimitConfiguration);
 	}
 
-	@Override
-	public void updated(String pid, Dictionary<String, ?> dictionary)
-		throws ConfigurationException {
+	@Activate
+	protected void activate(
+		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_unmapPid(pid);
+		modified(properties);
 
-		long companyId = GetterUtil.getLong(
-			dictionary.get("companyId"), CompanyConstants.SYSTEM);
-
-		if (companyId != CompanyConstants.SYSTEM) {
-			_updateCompanyConfiguration(companyId, pid, dictionary);
-		}
-
-		long groupId = GetterUtil.getLong(
-			dictionary.get("groupId"), GroupConstants.DEFAULT_PARENT_GROUP_ID);
-
-		if (groupId != GroupConstants.DEFAULT_PARENT_GROUP_ID) {
-			_updateGroupConfiguration(groupId, pid, dictionary);
-		}
+		_serviceRegistration = bundleContext.registerService(
+			ManagedServiceFactory.class, new DLSizeLimitManagedServiceFactory(),
+			HashMapDictionaryBuilder.put(
+				Constants.SERVICE_PID,
+				"com.liferay.document.library.internal.configuration." +
+					"DLSizeLimitConfiguration.scoped"
+			).build());
 	}
 
-	@Activate
+	@Deactivate
+	protected void deactivate() {
+		_serviceRegistration.unregister();
+	}
+
 	@Modified
-	protected void activate(Map<String, Object> properties) {
+	protected void modified(Map<String, Object> properties) {
 		_companyMimeTypeSizeLimitsMap = new ConcurrentHashMap<>();
 		_groupMimeTypeSizeLimitsMap = new ConcurrentHashMap<>();
 		_systemDLSizeLimitConfiguration = ConfigurableUtil.createConfigurable(
@@ -245,25 +233,6 @@ public class DLSizeLimitManagedServiceFactory implements ManagedServiceFactory {
 			});
 	}
 
-	private void _unmapPid(String pid) {
-		if (_companyIds.containsKey(pid)) {
-			long companyId = _companyIds.remove(pid);
-
-			_companyConfigurationBeans.remove(companyId);
-			_companyMimeTypeSizeLimitsMap.remove(companyId);
-
-			_groupConfigurationBeans.clear();
-			_groupIds.clear();
-			_groupMimeTypeSizeLimitsMap.clear();
-		}
-		else if (_groupIds.containsKey(pid)) {
-			long groupId = _groupIds.remove(pid);
-
-			_groupConfigurationBeans.remove(groupId);
-			_groupMimeTypeSizeLimitsMap.remove(groupId);
-		}
-	}
-
 	private void _updateCompanyConfiguration(
 		long companyId, String pid, Dictionary<String, ?> dictionary) {
 
@@ -298,6 +267,64 @@ public class DLSizeLimitManagedServiceFactory implements ManagedServiceFactory {
 	private GroupLocalService _groupLocalService;
 
 	private volatile Map<Long, Map<String, Long>> _groupMimeTypeSizeLimitsMap;
+	private ServiceRegistration<ManagedServiceFactory> _serviceRegistration;
 	private volatile DLSizeLimitConfiguration _systemDLSizeLimitConfiguration;
+
+	private class DLSizeLimitManagedServiceFactory
+		implements ManagedServiceFactory {
+
+		@Override
+		public void deleted(String pid) {
+			_unmapPid(pid);
+		}
+
+		@Override
+		public String getName() {
+			return "com.liferay.document.library.internal.configuration." +
+				"DLSizeLimitConfiguration.scoped";
+		}
+
+		@Override
+		public void updated(String pid, Dictionary<String, ?> dictionary)
+			throws ConfigurationException {
+
+			_unmapPid(pid);
+
+			long companyId = GetterUtil.getLong(
+				dictionary.get("companyId"), CompanyConstants.SYSTEM);
+
+			if (companyId != CompanyConstants.SYSTEM) {
+				_updateCompanyConfiguration(companyId, pid, dictionary);
+			}
+
+			long groupId = GetterUtil.getLong(
+				dictionary.get("groupId"),
+				GroupConstants.DEFAULT_PARENT_GROUP_ID);
+
+			if (groupId != GroupConstants.DEFAULT_PARENT_GROUP_ID) {
+				_updateGroupConfiguration(groupId, pid, dictionary);
+			}
+		}
+
+		private void _unmapPid(String pid) {
+			if (_companyIds.containsKey(pid)) {
+				long companyId = _companyIds.remove(pid);
+
+				_companyConfigurationBeans.remove(companyId);
+				_companyMimeTypeSizeLimitsMap.remove(companyId);
+
+				_groupConfigurationBeans.clear();
+				_groupIds.clear();
+				_groupMimeTypeSizeLimitsMap.clear();
+			}
+			else if (_groupIds.containsKey(pid)) {
+				long groupId = _groupIds.remove(pid);
+
+				_groupConfigurationBeans.remove(groupId);
+				_groupMimeTypeSizeLimitsMap.remove(groupId);
+			}
+		}
+
+	}
 
 }
