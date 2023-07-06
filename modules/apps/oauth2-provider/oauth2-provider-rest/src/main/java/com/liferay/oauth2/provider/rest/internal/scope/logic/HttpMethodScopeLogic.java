@@ -16,14 +16,12 @@ package com.liferay.oauth2.provider.rest.internal.scope.logic;
 
 import com.liferay.oauth2.provider.rest.internal.scope.util.HttpMethodScopeLogicUtil;
 import com.liferay.oauth2.provider.scope.ScopeChecker;
-import com.liferay.osgi.util.StringPlus;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -62,10 +60,11 @@ public class HttpMethodScopeLogic implements ScopeLogic {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_bundleContext = bundleContext;
+		_bundleContext = HttpMethodScopeLogicUtil.
+			setBundleContext(bundleContext);
 
-		_ignoreMissingScopes = new HashSet<>(
-			StringPlus.asList(properties.get("ignore.missing.scopes")));
+		_ignoreMissingScopes = HttpMethodScopeLogicUtil.
+			setIgnoreMissingScopes(properties);
 	}
 
 	private String _getHttpMethod(Method method) {

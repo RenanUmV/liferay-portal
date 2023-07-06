@@ -61,7 +61,7 @@ public class HttpMethodApplicationClientTest extends BaseClientTestCase {
 		Invocation.Builder builder = authorize(
 			webTarget.request(), getToken("oauthTestApplicationAfter"));
 
-		Assert.assertEquals("get", builder.get(String.class));
+			Assert.assertEquals("get", builder.get(String.class));
 
 		Response response = builder.post(
 			Entity.entity("post", MediaType.TEXT_PLAIN_TYPE));
