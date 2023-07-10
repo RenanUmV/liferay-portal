@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -171,8 +172,7 @@ public class ServerStatistics
 	protected void activate() {
 		CompanyStatistics companyStatistics = new CompanyStatistics();
 
-		_companyStatisticsByCompanyId.put(
-			companyStatistics.getCompanyId(), companyStatistics);
+		ServerStaticsUtil.setcompanyStatisticsByCompanyId(companyStatistics);
 		_companyStatisticsByWebId.put(
 			companyStatistics.getWebId(), companyStatistics);
 	}

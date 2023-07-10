@@ -167,7 +167,7 @@ public class HttpMethodFeature implements Feature {
 	private final Set<String> _scopes = new HashSet<>();
 	private ServiceRegistration<ScopeFinder> _serviceRegistration;
 
-	@Reference(target = "(oauth2.scope.checker.type=http.method)")
+	@Reference
 	private ScopeLogic _httpMethodScopeLogic;
 
 	private class HttpScopeCheckerContainerRequestFilter

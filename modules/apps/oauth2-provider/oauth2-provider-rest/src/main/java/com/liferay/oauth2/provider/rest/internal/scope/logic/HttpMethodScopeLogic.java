@@ -60,10 +60,10 @@ public class HttpMethodScopeLogic implements ScopeLogic {
 	protected void activate(
 		BundleContext bundleContext, Map<String, Object> properties) {
 
-		_bundleContext = HttpMethodScopeLogicUtil.
+		HttpMethodScopeLogicUtil.
 			setBundleContext(bundleContext);
 
-		_ignoreMissingScopes = HttpMethodScopeLogicUtil.
+		HttpMethodScopeLogicUtil.
 			setIgnoreMissingScopes(properties);
 	}
 
@@ -113,8 +113,5 @@ public class HttpMethodScopeLogic implements ScopeLogic {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		HttpMethodScopeLogic.class);
-
-	private BundleContext _bundleContext;
-	private Set<String> _ignoreMissingScopes;
 
 }
