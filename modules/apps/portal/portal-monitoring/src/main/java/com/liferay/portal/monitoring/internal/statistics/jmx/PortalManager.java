@@ -17,8 +17,8 @@ package com.liferay.portal.monitoring.internal.statistics.jmx;
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.monitoring.internal.statistics.portal.CompanyStatistics;
-import com.liferay.portal.monitoring.internal.statistics.portal.ServerStatistics;
 import com.liferay.portal.monitoring.internal.statistics.portal.ServerSummaryStatistics;
+import com.liferay.portal.monitoring.internal.statistics.portal.util.ServerStaticsUtil;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 
 	@Override
 	public long[] getCompanyIds() {
-		Set<Long> companyIds = _serverStatistics.getCompanyIds();
+		Set<Long> companyIds = ServerStaticsUtil.getCompanyIds();
 
 		return ArrayUtil.toArray(companyIds.toArray(new Long[0]));
 	}
@@ -143,14 +143,14 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 
 	public long getStartTime(long companyId) throws MonitoringException {
 		CompanyStatistics companyStatistics =
-			_serverStatistics.getCompanyStatistics(companyId);
+			ServerStaticsUtil.getCompanyStatistics(companyId);
 
 		return companyStatistics.getStartTime();
 	}
 
 	public long getStartTime(String webId) throws MonitoringException {
 		CompanyStatistics companyStatistics =
-			_serverStatistics.getCompanyStatistics(webId);
+			ServerStaticsUtil.getCompanyStatistics(webId);
 
 		return companyStatistics.getStartTime();
 	}
@@ -196,7 +196,7 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 	@Override
 	public long getUptime(long companyId) throws MonitoringException {
 		CompanyStatistics companyStatistics =
-			_serverStatistics.getCompanyStatistics(companyId);
+			ServerStaticsUtil.getCompanyStatistics(companyId);
 
 		return companyStatistics.getUptime();
 	}
@@ -204,35 +204,32 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 	@Override
 	public long getUptime(String webId) throws MonitoringException {
 		CompanyStatistics companyStatistics =
-			_serverStatistics.getCompanyStatistics(webId);
+			ServerStaticsUtil.getCompanyStatistics(webId);
 
 		return companyStatistics.getUptime();
 	}
 
 	@Override
 	public String[] getWebIds() {
-		Set<String> webIds = _serverStatistics.getWebIds();
+		Set<String> webIds = ServerStaticsUtil.getWebIds();
 
 		return webIds.toArray(new String[0]);
 	}
 
 	@Override
 	public void reset() {
-		_serverStatistics.reset();
+		ServerStaticsUtil.reset();
 	}
 
 	@Override
 	public void reset(long companyId) {
-		_serverStatistics.reset(companyId);
+		ServerStaticsUtil.reset(companyId);
 	}
 
 	@Override
 	public void reset(String webId) {
-		_serverStatistics.reset(webId);
+		ServerStaticsUtil.reset(webId);
 	}
-
-	@Reference
-	private ServerStatistics _serverStatistics;
 
 	@Reference
 	private ServerSummaryStatistics _serverSummaryStatistics;
