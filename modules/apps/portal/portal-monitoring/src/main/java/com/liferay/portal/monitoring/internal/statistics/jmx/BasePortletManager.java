@@ -15,10 +15,9 @@
 package com.liferay.portal.monitoring.internal.statistics.jmx;
 
 import com.liferay.portal.kernel.monitoring.MonitoringException;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.monitoring.internal.statistics.portlet.PortletSummaryStatistics;
-import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsUtil;
+import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsHelper;
 
 import java.util.Set;
 
@@ -102,7 +101,7 @@ public abstract class BasePortletManager
 
 	@Override
 	public long[] getCompanyIds() {
-		Set<Long> companyIds = ServerStaticsUtil.getCompanyIds();
+		Set<Long> companyIds = serverStaticsHelper.getPortletCompanyIds();
 
 		return ArrayUtil.toArray(companyIds.toArray(new Long[0]));
 	}
@@ -279,7 +278,7 @@ public abstract class BasePortletManager
 
 	@Override
 	public String[] getPortletIds() {
-		Set<String> portletIds = ServerStaticsUtil.getPortletIds();
+		Set<String> portletIds = serverStaticsHelper.getPortletIds();
 
 		return portletIds.toArray(new String[0]);
 	}
@@ -466,29 +465,29 @@ public abstract class BasePortletManager
 
 	@Override
 	public String[] getWebIds() {
-		Set<String> webIds = ServerStaticsUtil.getWebIds();
+		Set<String> webIds = serverStaticsHelper.getPortalWebIds();
 
 		return webIds.toArray(new String[0]);
 	}
 
 	@Override
 	public void reset() {
-		ServerStaticsUtil.reset(companyLocalService);
+		serverStaticsHelper.resetPortletCompanyStatistics();
 	}
 
 	@Override
 	public void reset(long companyId) {
-		ServerStaticsUtil.reset(companyId);
+		serverStaticsHelper.resetPortalCompanyStatistics(companyId);
 	}
 
 	@Override
 	public void reset(String webId) {
-		ServerStaticsUtil.reset(webId);
+		serverStaticsHelper.resetPortalCompanyStatistics(webId);
 	}
 
 	protected abstract PortletSummaryStatistics getPortletSummaryStatistics();
 
 	@Reference
-	protected CompanyLocalService companyLocalService;
+	protected ServerStaticsHelper serverStaticsHelper;
 
 }

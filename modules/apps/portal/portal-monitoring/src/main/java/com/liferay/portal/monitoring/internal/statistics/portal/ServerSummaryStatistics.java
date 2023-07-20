@@ -17,11 +17,12 @@ package com.liferay.portal.monitoring.internal.statistics.portal;
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.monitoring.internal.statistics.RequestStatistics;
 import com.liferay.portal.monitoring.internal.statistics.SummaryStatistics;
-import com.liferay.portal.monitoring.internal.statistics.portal.util.ServerStaticsUtil;
+import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsHelper;
 
 import java.util.Set;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Michael C. Han
@@ -35,23 +36,25 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 
 	@Override
 	public long getAverageTime() {
-		Set<CompanyStatistics> companyStatisticsSet =
-			ServerStaticsUtil.getCompanyStatisticsSet();
+		Set<PortalCompanyStatistics> portalCompanyStatisticsSet =
+			_serverStaticsHelper.getPortalCompanyStatisticsSet();
 
-		if (companyStatisticsSet.isEmpty()) {
+		if (portalCompanyStatisticsSet.isEmpty()) {
 			return 0;
 		}
 
 		long averageTime = 0;
 
-		for (CompanyStatistics companyStatistics : companyStatisticsSet) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				portalCompanyStatisticsSet) {
+
 			RequestStatistics requestStatistics =
-				companyStatistics.getRequestStatistics();
+				portalCompanyStatistics.getRequestStatistics();
 
 			averageTime += requestStatistics.getAverageTime();
 		}
 
-		return averageTime / companyStatisticsSet.size();
+		return averageTime / portalCompanyStatisticsSet.size();
 	}
 
 	@Override
@@ -76,11 +79,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getErrorCount() {
 		int errorCount = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
-				companyStatistics.getRequestStatistics();
+				portalCompanyStatistics.getRequestStatistics();
 
 			errorCount += requestStatistics.getErrorCount();
 		}
@@ -110,11 +113,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getMaxTime() {
 		long maxTime = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
-			if (companyStatistics.getMaxTime() > maxTime) {
-				maxTime = companyStatistics.getMaxTime();
+			if (portalCompanyStatistics.getMaxTime() > maxTime) {
+				maxTime = portalCompanyStatistics.getMaxTime();
 			}
 		}
 
@@ -139,11 +142,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getMinTime() {
 		long minTime = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
-			if (companyStatistics.getMinTime() < minTime) {
-				minTime = companyStatistics.getMinTime();
+			if (portalCompanyStatistics.getMinTime() < minTime) {
+				minTime = portalCompanyStatistics.getMinTime();
 			}
 		}
 
@@ -168,11 +171,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getRequestCount() {
 		int requestCount = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
-				companyStatistics.getRequestStatistics();
+				portalCompanyStatistics.getRequestStatistics();
 
 			requestCount += requestStatistics.getRequestCount();
 		}
@@ -202,11 +205,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getSuccessCount() {
 		int successCount = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
-				companyStatistics.getRequestStatistics();
+				portalCompanyStatistics.getRequestStatistics();
 
 			successCount += requestStatistics.getSuccessCount();
 		}
@@ -236,11 +239,11 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	public long getTimeoutCount() {
 		int timeoutCount = 0;
 
-		for (CompanyStatistics companyStatistics :
-				ServerStaticsUtil.getCompanyStatisticsSet()) {
+		for (PortalCompanyStatistics portalCompanyStatistics :
+				_serverStaticsHelper.getPortalCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
-				companyStatistics.getRequestStatistics();
+				portalCompanyStatistics.getRequestStatistics();
 
 			timeoutCount += requestStatistics.getTimeoutCount();
 		}
@@ -270,10 +273,10 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		throws MonitoringException {
 
 		try {
-			CompanyStatistics companyStatistics =
-				ServerStaticsUtil.getCompanyStatistics(companyId);
+			PortalCompanyStatistics portalCompanyStatistics =
+				_serverStaticsHelper.getPortalCompanyStatistics(companyId);
 
-			return companyStatistics.getRequestStatistics();
+			return portalCompanyStatistics.getRequestStatistics();
 		}
 		catch (Exception exception) {
 			throw new MonitoringException(
@@ -286,15 +289,18 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		throws MonitoringException {
 
 		try {
-			CompanyStatistics companyStatistics =
-				ServerStaticsUtil.getCompanyStatistics(webId);
+			PortalCompanyStatistics portalCompanyStatistics =
+				_serverStaticsHelper.getPortalCompanyStatistics(webId);
 
-			return companyStatistics.getRequestStatistics();
+			return portalCompanyStatistics.getRequestStatistics();
 		}
 		catch (Exception exception) {
 			throw new MonitoringException(
 				"Unable to get company with web ID " + webId, exception);
 		}
 	}
+
+	@Reference
+	private ServerStaticsHelper _serverStaticsHelper;
 
 }

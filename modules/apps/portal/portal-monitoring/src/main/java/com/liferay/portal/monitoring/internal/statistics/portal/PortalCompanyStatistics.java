@@ -26,10 +26,10 @@ import com.liferay.portal.monitoring.internal.statistics.RequestStatistics;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-public class CompanyStatistics
+public class PortalCompanyStatistics
 	implements DataSampleProcessor<PortalRequestDataSample> {
 
-	public CompanyStatistics() {
+	public PortalCompanyStatistics() {
 		_companyId = CompanyConstants.SYSTEM;
 
 		_webId = CompanyConstants.SYSTEM_STRING;
@@ -37,7 +37,7 @@ public class CompanyStatistics
 		_requestStatistics = new RequestStatistics(_webId);
 	}
 
-	public CompanyStatistics(
+	public PortalCompanyStatistics(
 		CompanyLocalService companyLocalService, String webId) {
 
 		try {

@@ -17,10 +17,8 @@ package com.liferay.portal.monitoring.internal.statistics.portlet;
 import com.liferay.portal.kernel.model.Company;
 import com.liferay.portal.kernel.monitoring.DataSampleProcessor;
 import com.liferay.portal.kernel.monitoring.MonitoringException;
-import com.liferay.portal.kernel.service.CompanyLocalService;
-import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsUtil;
+import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsHelper;
 
-import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -42,18 +40,20 @@ public class ServerStatistics
 
 		long companyId = portletRequestDataSample.getCompanyId();
 
-		CompanyStatistics companyStatistics =
-			ServerStaticsUtil.getCompanyStatisticsByCompanyId(
+		PortletCompanyStatistics portletCompanyStatistics =
+			_serverStaticsHelper.getPortletCompanyStatisticsByCompanyId(
 			).get(
 				companyId
 			);
 
-		if (companyStatistics == null) {
+		if (portletCompanyStatistics == null) {
 			try {
-				Company company = _companyLocalService.getCompany(companyId);
+				Company company = _serverStaticsHelper.getCompanyByCompanyId(
+					companyId);
 
-				companyStatistics = ServerStaticsUtil.register(
-					company.getWebId(), _companyLocalService);
+				portletCompanyStatistics =
+					_serverStaticsHelper.registerPortletCompanyStatistics(
+						company.getWebId());
 			}
 			catch (Exception exception) {
 				throw new IllegalStateException(
@@ -62,19 +62,10 @@ public class ServerStatistics
 			}
 		}
 
-		companyStatistics.processDataSample(portletRequestDataSample);
-	}
-
-	@Activate
-	protected void activate() {
-		CompanyStatistics companyStatistics = new CompanyStatistics();
-
-		ServerStaticsUtil.setCompanyStatisticsByCompanyId(companyStatistics);
-
-		ServerStaticsUtil.setCompanyStatisticsByWebId(companyStatistics);
+		portletCompanyStatistics.processDataSample(portletRequestDataSample);
 	}
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
+	private ServerStaticsHelper _serverStaticsHelper;
 
 }

@@ -32,15 +32,15 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Michael C. Han
  * @author Brian Wing Shun Chan
  */
-public class CompanyStatistics
+public class PortletCompanyStatistics
 	implements DataSampleProcessor<PortletRequestDataSample> {
 
-	public CompanyStatistics() {
+	public PortletCompanyStatistics() {
 		_companyId = CompanyConstants.SYSTEM;
 		_webId = CompanyConstants.SYSTEM_STRING;
 	}
 
-	public CompanyStatistics(
+	public PortletCompanyStatistics(
 		CompanyLocalService companyLocalService, String webId) {
 
 		try {

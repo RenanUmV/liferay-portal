@@ -16,9 +16,9 @@ package com.liferay.portal.monitoring.internal.statistics.jmx;
 
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.monitoring.internal.statistics.portal.CompanyStatistics;
+import com.liferay.portal.monitoring.internal.statistics.portal.PortalCompanyStatistics;
 import com.liferay.portal.monitoring.internal.statistics.portal.ServerSummaryStatistics;
-import com.liferay.portal.monitoring.internal.statistics.portal.util.ServerStaticsUtil;
+import com.liferay.portal.monitoring.internal.statistics.util.ServerStaticsHelper;
 
 import java.util.Set;
 
@@ -68,7 +68,7 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 
 	@Override
 	public long[] getCompanyIds() {
-		Set<Long> companyIds = ServerStaticsUtil.getCompanyIds();
+		Set<Long> companyIds = _serverStaticsHelper.getPortalCompanyIds();
 
 		return ArrayUtil.toArray(companyIds.toArray(new Long[0]));
 	}
@@ -142,17 +142,17 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 	}
 
 	public long getStartTime(long companyId) throws MonitoringException {
-		CompanyStatistics companyStatistics =
-			ServerStaticsUtil.getCompanyStatistics(companyId);
+		PortalCompanyStatistics portalCompanyStatistics =
+			_serverStaticsHelper.getPortalCompanyStatistics(companyId);
 
-		return companyStatistics.getStartTime();
+		return portalCompanyStatistics.getStartTime();
 	}
 
 	public long getStartTime(String webId) throws MonitoringException {
-		CompanyStatistics companyStatistics =
-			ServerStaticsUtil.getCompanyStatistics(webId);
+		PortalCompanyStatistics portalCompanyStatistics =
+			_serverStaticsHelper.getPortalCompanyStatistics(webId);
 
-		return companyStatistics.getStartTime();
+		return portalCompanyStatistics.getStartTime();
 	}
 
 	@Override
@@ -195,41 +195,44 @@ public class PortalManager extends StandardMBean implements PortalManagerMBean {
 
 	@Override
 	public long getUptime(long companyId) throws MonitoringException {
-		CompanyStatistics companyStatistics =
-			ServerStaticsUtil.getCompanyStatistics(companyId);
+		PortalCompanyStatistics portalCompanyStatistics =
+			_serverStaticsHelper.getPortalCompanyStatistics(companyId);
 
-		return companyStatistics.getUptime();
+		return portalCompanyStatistics.getUptime();
 	}
 
 	@Override
 	public long getUptime(String webId) throws MonitoringException {
-		CompanyStatistics companyStatistics =
-			ServerStaticsUtil.getCompanyStatistics(webId);
+		PortalCompanyStatistics portalCompanyStatistics =
+			_serverStaticsHelper.getPortalCompanyStatistics(webId);
 
-		return companyStatistics.getUptime();
+		return portalCompanyStatistics.getUptime();
 	}
 
 	@Override
 	public String[] getWebIds() {
-		Set<String> webIds = ServerStaticsUtil.getWebIds();
+		Set<String> webIds = _serverStaticsHelper.getPortalWebIds();
 
 		return webIds.toArray(new String[0]);
 	}
 
 	@Override
 	public void reset() {
-		ServerStaticsUtil.reset();
+		_serverStaticsHelper.resetPortalCompanyStatistics();
 	}
 
 	@Override
 	public void reset(long companyId) {
-		ServerStaticsUtil.reset(companyId);
+		_serverStaticsHelper.resetPortalCompanyStatistics(companyId);
 	}
 
 	@Override
 	public void reset(String webId) {
-		ServerStaticsUtil.reset(webId);
+		_serverStaticsHelper.resetPortalCompanyStatistics(webId);
 	}
+
+	@Reference
+	private ServerStaticsHelper _serverStaticsHelper;
 
 	@Reference
 	private ServerSummaryStatistics _serverSummaryStatistics;
