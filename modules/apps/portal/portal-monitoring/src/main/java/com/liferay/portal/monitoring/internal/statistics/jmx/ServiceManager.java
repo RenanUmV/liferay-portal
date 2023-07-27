@@ -5,7 +5,7 @@
 
 package com.liferay.portal.monitoring.internal.statistics.jmx;
 
-import com.liferay.portal.monitoring.internal.statistics.service.ServerStatistics;
+import com.liferay.portal.monitoring.internal.statistics.service.ServiceRequestDataSampleProcessor;
 
 import javax.management.DynamicMBean;
 import javax.management.NotCompliantMBeanException;
@@ -36,7 +36,7 @@ public class ServiceManager
 	public long getErrorCount(
 		String className, String methodName, String[] parameterTypes) {
 
-		return _serverStatistics.getErrorCount(
+		return _serviceRequestDataSampleProcessor.getErrorCount(
 			className, methodName, parameterTypes);
 	}
 
@@ -44,7 +44,7 @@ public class ServiceManager
 	public long getMaxTime(
 		String className, String methodName, String[] parameterTypes) {
 
-		return _serverStatistics.getMaxTime(
+		return _serviceRequestDataSampleProcessor.getMaxTime(
 			className, methodName, parameterTypes);
 	}
 
@@ -52,7 +52,7 @@ public class ServiceManager
 	public long getMinTime(
 		String className, String methodName, String[] parameterTypes) {
 
-		return _serverStatistics.getMinTime(
+		return _serviceRequestDataSampleProcessor.getMinTime(
 			className, methodName, parameterTypes);
 	}
 
@@ -60,11 +60,12 @@ public class ServiceManager
 	public long getRequestCount(
 		String className, String methodName, String[] parameterTypes) {
 
-		return _serverStatistics.getRequestCount(
+		return _serviceRequestDataSampleProcessor.getRequestCount(
 			className, methodName, parameterTypes);
 	}
 
 	@Reference
-	private ServerStatistics _serverStatistics;
+	private ServiceRequestDataSampleProcessor
+		_serviceRequestDataSampleProcessor;
 
 }

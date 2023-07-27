@@ -1,5 +1,5 @@
 /**
- * SPDX-FileCopyrightText: (c) 2000 Liferay, Inc. https://liferay.com
+ * SPDX-FileCopyrightText: (c) 2023 Liferay, Inc. https://liferay.com
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
@@ -18,9 +18,11 @@ import org.osgi.service.component.annotations.Component;
  */
 @Component(
 	enabled = false, property = "namespace=com.liferay.monitoring.Service",
-	service = {DataSampleProcessor.class, ServerStatistics.class}
+	service = {
+		DataSampleProcessor.class, ServiceRequestDataSampleProcessor.class
+	}
 )
-public class ServerStatistics
+public class ServiceRequestDataSampleProcessor
 	implements DataSampleProcessor<ServiceRequestDataSample> {
 
 	public long getAverageTime(
