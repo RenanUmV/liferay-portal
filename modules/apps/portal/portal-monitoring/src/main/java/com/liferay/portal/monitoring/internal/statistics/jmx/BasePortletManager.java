@@ -7,8 +7,8 @@ package com.liferay.portal.monitoring.internal.statistics.jmx;
 
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.kernel.util.ArrayUtil;
-import com.liferay.portal.monitoring.internal.statistics.portlet.PortletRequestDataSampleProcessor;
 import com.liferay.portal.monitoring.internal.statistics.portlet.PortletSummaryStatistics;
+import com.liferay.portal.monitoring.internal.statistics.portlet.helper.PortletRequestDataSampleProcessorHelper;
 
 import java.util.Set;
 
@@ -93,7 +93,7 @@ public abstract class BasePortletManager
 	@Override
 	public long[] getCompanyIds() {
 		Set<Long> companyIds =
-			portletRequestDataSampleProcessor.getCompanyIds();
+			portletRequestDataSampleProcessorHelper.getCompanyIds();
 
 		return ArrayUtil.toArray(companyIds.toArray(new Long[0]));
 	}
@@ -271,7 +271,7 @@ public abstract class BasePortletManager
 	@Override
 	public String[] getPortletIds() {
 		Set<String> portletIds =
-			portletRequestDataSampleProcessor.getPortletIds();
+			portletRequestDataSampleProcessorHelper.getPortletIds();
 
 		return portletIds.toArray(new String[0]);
 	}
@@ -458,30 +458,31 @@ public abstract class BasePortletManager
 
 	@Override
 	public String[] getWebIds() {
-		Set<String> webIds = portletRequestDataSampleProcessor.getWebIds();
+		Set<String> webIds =
+			portletRequestDataSampleProcessorHelper.getWebIds();
 
 		return webIds.toArray(new String[0]);
 	}
 
 	@Override
 	public void reset() {
-		portletRequestDataSampleProcessor.reset();
+		portletRequestDataSampleProcessorHelper.reset();
 	}
 
 	@Override
 	public void reset(long companyId) {
-		portletRequestDataSampleProcessor.reset(companyId);
+		portletRequestDataSampleProcessorHelper.reset(companyId);
 	}
 
 	@Override
 	public void reset(String webId) {
-		portletRequestDataSampleProcessor.reset(webId);
+		portletRequestDataSampleProcessorHelper.reset(webId);
 	}
 
 	protected abstract PortletSummaryStatistics getPortletSummaryStatistics();
 
 	@Reference
-	protected PortletRequestDataSampleProcessor
-		portletRequestDataSampleProcessor;
+	protected PortletRequestDataSampleProcessorHelper
+		portletRequestDataSampleProcessorHelper;
 
 }
