@@ -7,8 +7,8 @@ package com.liferay.portal.monitoring.internal.statistics.jmx;
 
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.kernel.util.ArrayUtil;
+import com.liferay.portal.monitoring.internal.statistics.portlet.PortletRequestDataSampleProcessor;
 import com.liferay.portal.monitoring.internal.statistics.portlet.PortletSummaryStatistics;
-import com.liferay.portal.monitoring.internal.statistics.portlet.ServerStatistics;
 
 import java.util.Set;
 
@@ -92,7 +92,8 @@ public abstract class BasePortletManager
 
 	@Override
 	public long[] getCompanyIds() {
-		Set<Long> companyIds = serverStatistics.getCompanyIds();
+		Set<Long> companyIds =
+			portletRequestDataSampleProcessor.getCompanyIds();
 
 		return ArrayUtil.toArray(companyIds.toArray(new Long[0]));
 	}
@@ -269,7 +270,8 @@ public abstract class BasePortletManager
 
 	@Override
 	public String[] getPortletIds() {
-		Set<String> portletIds = serverStatistics.getPortletIds();
+		Set<String> portletIds =
+			portletRequestDataSampleProcessor.getPortletIds();
 
 		return portletIds.toArray(new String[0]);
 	}
@@ -456,29 +458,30 @@ public abstract class BasePortletManager
 
 	@Override
 	public String[] getWebIds() {
-		Set<String> webIds = serverStatistics.getWebIds();
+		Set<String> webIds = portletRequestDataSampleProcessor.getWebIds();
 
 		return webIds.toArray(new String[0]);
 	}
 
 	@Override
 	public void reset() {
-		serverStatistics.reset();
+		portletRequestDataSampleProcessor.reset();
 	}
 
 	@Override
 	public void reset(long companyId) {
-		serverStatistics.reset(companyId);
+		portletRequestDataSampleProcessor.reset(companyId);
 	}
 
 	@Override
 	public void reset(String webId) {
-		serverStatistics.reset(webId);
+		portletRequestDataSampleProcessor.reset(webId);
 	}
 
 	protected abstract PortletSummaryStatistics getPortletSummaryStatistics();
 
 	@Reference
-	protected ServerStatistics serverStatistics;
+	protected PortletRequestDataSampleProcessor
+		portletRequestDataSampleProcessor;
 
 }
