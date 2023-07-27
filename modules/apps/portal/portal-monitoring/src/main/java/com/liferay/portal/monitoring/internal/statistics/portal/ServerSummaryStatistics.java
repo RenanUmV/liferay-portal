@@ -8,6 +8,7 @@ package com.liferay.portal.monitoring.internal.statistics.portal;
 import com.liferay.portal.kernel.monitoring.MonitoringException;
 import com.liferay.portal.monitoring.internal.statistics.RequestStatistics;
 import com.liferay.portal.monitoring.internal.statistics.SummaryStatistics;
+import com.liferay.portal.monitoring.internal.statistics.portal.helper.PortalRequestDataSampleProcessorHelper;
 
 import java.util.Set;
 
@@ -27,7 +28,7 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	@Override
 	public long getAverageTime() {
 		Set<CompanyStatistics> companyStatisticsSet =
-			_portalRequestDataSampleProcessor.getCompanyStatisticsSet();
+			_portalRequestDataSampleProcessorHelper.getCompanyStatisticsSet();
 
 		if (companyStatisticsSet.isEmpty()) {
 			return 0;
@@ -68,7 +69,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		int errorCount = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
 				companyStatistics.getRequestStatistics();
@@ -102,7 +104,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		long maxTime = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			if (companyStatistics.getMaxTime() > maxTime) {
 				maxTime = companyStatistics.getMaxTime();
@@ -131,7 +134,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		long minTime = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			if (companyStatistics.getMinTime() < minTime) {
 				minTime = companyStatistics.getMinTime();
@@ -160,7 +164,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		int requestCount = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
 				companyStatistics.getRequestStatistics();
@@ -194,7 +199,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		int successCount = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
 				companyStatistics.getRequestStatistics();
@@ -228,7 +234,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 		int timeoutCount = 0;
 
 		for (CompanyStatistics companyStatistics :
-				_portalRequestDataSampleProcessor.getCompanyStatisticsSet()) {
+				_portalRequestDataSampleProcessorHelper.
+					getCompanyStatisticsSet()) {
 
 			RequestStatistics requestStatistics =
 				companyStatistics.getRequestStatistics();
@@ -262,7 +269,7 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 
 		try {
 			CompanyStatistics companyStatistics =
-				_portalRequestDataSampleProcessor.getCompanyStatistics(
+				_portalRequestDataSampleProcessorHelper.getCompanyStatistics(
 					companyId);
 
 			return companyStatistics.getRequestStatistics();
@@ -279,7 +286,8 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 
 		try {
 			CompanyStatistics companyStatistics =
-				_portalRequestDataSampleProcessor.getCompanyStatistics(webId);
+				_portalRequestDataSampleProcessorHelper.getCompanyStatistics(
+					webId);
 
 			return companyStatistics.getRequestStatistics();
 		}
@@ -290,6 +298,7 @@ public class ServerSummaryStatistics implements SummaryStatistics {
 	}
 
 	@Reference
-	private PortalRequestDataSampleProcessor _portalRequestDataSampleProcessor;
+	private PortalRequestDataSampleProcessorHelper
+		_portalRequestDataSampleProcessorHelper;
 
 }
