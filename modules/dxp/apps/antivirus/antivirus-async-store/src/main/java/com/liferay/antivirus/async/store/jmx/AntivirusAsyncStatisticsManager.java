@@ -22,7 +22,6 @@ import com.liferay.portal.kernel.scheduler.messaging.SchedulerResponse;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.DynamicMBean;
 import javax.management.NotCompliantMBeanException;
 import javax.management.StandardMBean;
 
@@ -42,15 +41,10 @@ import org.osgi.service.component.annotations.Reference;
 		"jmx.objectname=com.liferay.antivirus:classification=antivirus_async,name=AntivirusAsyncStatistics",
 		"jmx.objectname.cache.key=AntivirusAsyncStatistics"
 	},
-	service = {
-		AntivirusAsyncEventListener.class,
-		AntivirusAsyncStatisticsManagerMBean.class, DynamicMBean.class
-	}
+	service = AntivirusAsyncStatisticsManagerMBean.class
 )
 public class AntivirusAsyncStatisticsManager
-	extends StandardMBean
-	implements AntivirusAsyncEventListener,
-			   AntivirusAsyncStatisticsManagerMBean {
+	extends StandardMBean implements AntivirusAsyncStatisticsManagerMBean {
 
 	@Activate
 	public AntivirusAsyncStatisticsManager(
@@ -126,26 +120,6 @@ public class AntivirusAsyncStatisticsManager
 	}
 
 	@Override
-	public void receive(Message message) {
-		AntivirusAsyncEvent antivirusAsyncEvent =
-			(AntivirusAsyncEvent)message.get("antivirusAsyncEvent");
-
-		if (antivirusAsyncEvent == AntivirusAsyncEvent.PROCESSING_ERROR) {
-			_processingErrorCounter.incrementAndGet();
-		}
-		else if (antivirusAsyncEvent == AntivirusAsyncEvent.SIZE_EXCEEDED) {
-			_sizeExceededCounter.incrementAndGet();
-		}
-		else if (antivirusAsyncEvent == AntivirusAsyncEvent.SUCCESS) {
-			_totalScannedCounter.incrementAndGet();
-		}
-		else if (antivirusAsyncEvent == AntivirusAsyncEvent.VIRUS_FOUND) {
-			_totalScannedCounter.incrementAndGet();
-			_virusFoundCounter.incrementAndGet();
-		}
-	}
-
-	@Override
 	public void refresh() {
 		if (System.currentTimeMillis() > _lastRefresh) {
 			_destinationStatistics = _destination.getDestinationStatistics();
@@ -173,9 +147,32 @@ public class AntivirusAsyncStatisticsManager
 
 	@Reference
 	private SchedulerEngineHelper _schedulerEngineHelper;
-
 	private final AtomicLong _sizeExceededCounter = new AtomicLong();
 	private final AtomicLong _totalScannedCounter = new AtomicLong();
 	private final AtomicLong _virusFoundCounter = new AtomicLong();
+	private class AntivirusAsyncStatisticsManagerEventListener
+		implements AntivirusAsyncEventListener {
+
+		@Override
+		public void receive(Message message) {
+			AntivirusAsyncEvent antivirusAsyncEvent =
+				(AntivirusAsyncEvent)message.get("antivirusAsyncEvent");
+
+			if (antivirusAsyncEvent == AntivirusAsyncEvent.PROCESSING_ERROR) {
+				_processingErrorCounter.incrementAndGet();
+			}
+			else if (antivirusAsyncEvent == AntivirusAsyncEvent.SIZE_EXCEEDED) {
+				_sizeExceededCounter.incrementAndGet();
+			}
+			else if (antivirusAsyncEvent == AntivirusAsyncEvent.SUCCESS) {
+				_totalScannedCounter.incrementAndGet();
+			}
+			else if (antivirusAsyncEvent == AntivirusAsyncEvent.VIRUS_FOUND) {
+				_totalScannedCounter.incrementAndGet();
+				_virusFoundCounter.incrementAndGet();
+			}
+		}
+
+	}
 
 }
