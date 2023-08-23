@@ -7,16 +7,10 @@ package com.liferay.document.library.preview.pdf.internal;
 
 import com.liferay.document.library.kernel.document.conversion.DocumentConversionUtil;
 import com.liferay.document.library.kernel.exception.NoSuchFileEntryException;
-import com.liferay.document.library.kernel.model.DLProcessorConstants;
-import com.liferay.document.library.kernel.store.Store;
-import com.liferay.document.library.kernel.util.DLPreviewableProcessor;
-import com.liferay.document.library.kernel.util.DLProcessor;
 import com.liferay.document.library.kernel.util.DLUtil;
-import com.liferay.document.library.kernel.util.PDFProcessor;
 import com.liferay.document.library.preview.pdf.internal.background.task.PDFPreviewBackgroundTaskExecutor;
 import com.liferay.document.library.preview.pdf.internal.configuration.admin.service.PDFPreviewManagedServiceFactory;
 import com.liferay.document.library.preview.pdf.internal.util.ProcessConfigUtil;
-import com.liferay.exportimport.kernel.lar.PortletDataContext;
 import com.liferay.petra.process.ProcessCallable;
 import com.liferay.petra.process.ProcessChannel;
 import com.liferay.petra.process.ProcessException;
@@ -30,23 +24,16 @@ import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.image.Ghostscript;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.messaging.DestinationNames;
 import com.liferay.portal.kernel.model.CompanyConstants;
 import com.liferay.portal.kernel.model.UserConstants;
 import com.liferay.portal.kernel.repository.event.FileVersionPreviewEventListener;
-import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
-import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.FileUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.HashMapBuilder;
-import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.SystemEnv;
-import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUID;
-import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.util.PropsUtil;
 import com.liferay.portal.util.PropsValues;
 
@@ -56,13 +43,10 @@ import java.io.InputStream;
 import java.io.Serializable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
-import java.util.Set;
-import java.util.Vector;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -88,24 +72,10 @@ import org.osgi.service.component.annotations.Reference;
  * @author Sergio González
  * @author Ivica Cardic
  */
-@Component(
-	property = "type=" + DLProcessorConstants.PDF_PROCESSOR,
-	service = {DLProcessor.class, PDFProcessor.class}
-)
-public class PDFProcessorImpl
-	extends DLPreviewableProcessor implements PDFProcessor {
-
-	@Override
-	public void afterPropertiesSet() {
-		FileUtil.mkdirs(DECRYPT_TMP_PATH);
-		FileUtil.mkdirs(PREVIEW_TMP_PATH);
-		FileUtil.mkdirs(THUMBNAIL_TMP_PATH);
-	}
-
-	@Override
-	public void destroy() {
-		FileUtil.deltree(TMP_PATH);
-	}
+@Component(service = com.liferay.document.library.kernel.util.PDFProcessor.class)
+public class PDFProcessor
+	extends PDFDLProcessor
+	implements com.liferay.document.library.kernel.util.PDFProcessor {
 
 	@Override
 	public void generateImages(
@@ -158,14 +128,7 @@ public class PDFProcessorImpl
 
 	@Override
 	public int getPreviewFileCount(FileVersion fileVersion) {
-		try {
-			return doGetPreviewFileCount(fileVersion);
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
-		return 0;
+		return getPreviewFileCount(fileVersion);
 	}
 
 	@Override
@@ -190,26 +153,8 @@ public class PDFProcessorImpl
 	}
 
 	@Override
-	public String getType() {
-		return DLProcessorConstants.PDF_PROCESSOR;
-	}
-
-	@Override
 	public boolean hasImages(FileVersion fileVersion) {
-		boolean hasImages = false;
-
-		try {
-			hasImages = _hasImages(fileVersion);
-
-			if (!hasImages && isSupported(fileVersion)) {
-				_queueGeneration(null, fileVersion);
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-
-		return hasImages;
+		return hasImages(fileVersion);
 	}
 
 	@Override
@@ -223,42 +168,12 @@ public class PDFProcessorImpl
 	}
 
 	@Override
-	public boolean isSupported(String mimeType) {
-		if (Validator.isNull(mimeType)) {
-			return false;
-		}
-
-		if (mimeType.equals(ContentTypes.APPLICATION_PDF) ||
-			mimeType.equals(ContentTypes.APPLICATION_X_PDF)) {
-
-			return true;
-		}
-
-		if (DocumentConversionUtil.isEnabled()) {
-			Set<String> extensions = MimeTypesUtil.getExtensions(mimeType);
-
-			for (String extension : extensions) {
-				extension = extension.substring(1);
-
-				String[] targetExtensions =
-					DocumentConversionUtil.getConversions(extension);
-
-				if (Arrays.binarySearch(targetExtensions, "pdf") >= 0) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	@Override
 	public void trigger(
 		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
 
 		super.trigger(sourceFileVersion, destinationFileVersion);
 
-		_queueGeneration(sourceFileVersion, destinationFileVersion);
+		queueGeneration(sourceFileVersion, destinationFileVersion);
 	}
 
 	@Activate
@@ -266,135 +181,9 @@ public class PDFProcessorImpl
 		afterPropertiesSet();
 	}
 
-	@Override
-	protected void copyPreviews(
-		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
-
-		if (!PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED) {
-			return;
-		}
-
-		try {
-			if (hasPreview(sourceFileVersion) &&
-				!hasPreview(destinationFileVersion)) {
-
-				int count = getPreviewFileCount(sourceFileVersion);
-
-				for (int i = 0; i < count; i++) {
-					String previewFilePath = getPreviewFilePath(
-						destinationFileVersion, i + 1);
-
-					InputStream inputStream = doGetPreviewAsStream(
-						sourceFileVersion, i + 1, PREVIEW_TYPE);
-
-					addFileToStore(
-						destinationFileVersion.getCompanyId(), PREVIEW_PATH,
-						previewFilePath, inputStream);
-				}
-			}
-		}
-		catch (Exception exception) {
-			_log.error(exception);
-		}
-	}
-
 	@Deactivate
 	protected void deactivate() {
 		destroy();
-	}
-
-	@Override
-	protected void doExportGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			Element fileEntryElement)
-		throws Exception {
-
-		exportThumbnails(
-			portletDataContext, fileEntry, fileEntryElement, "pdf");
-
-		exportPreviews(portletDataContext, fileEntry, fileEntryElement);
-	}
-
-	@Override
-	protected void doImportGeneratedFiles(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			FileEntry importedFileEntry, Element fileEntryElement)
-		throws Exception {
-
-		importThumbnails(
-			portletDataContext, fileEntry, importedFileEntry, fileEntryElement,
-			"pdf");
-
-		importPreviews(
-			portletDataContext, fileEntry, importedFileEntry, fileEntryElement);
-	}
-
-	protected void exportPreviews(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			Element fileEntryElement)
-		throws Exception {
-
-		FileVersion fileVersion = fileEntry.getFileVersion();
-
-		if (!isSupported(fileVersion) || !_hasImages(fileVersion)) {
-			return;
-		}
-
-		if (!portletDataContext.isPerformDirectBinaryImport()) {
-			int previewFileCount = getPreviewFileCount(fileVersion);
-
-			fileEntryElement.addAttribute(
-				"bin-path-pdf-preview-count", String.valueOf(previewFileCount));
-
-			for (int i = 0; i < previewFileCount; i++) {
-				exportPreview(
-					portletDataContext, fileEntry, fileEntryElement, "pdf",
-					PREVIEW_TYPE, i);
-			}
-		}
-	}
-
-	@Override
-	protected List<Long> getFileVersionIds() {
-		return _fileVersionIds;
-	}
-
-	@Override
-	protected String getPreviewType(FileVersion fileVersion) {
-		return PREVIEW_TYPE;
-	}
-
-	@Override
-	protected String getThumbnailType(FileVersion fileVersion) {
-		return THUMBNAIL_TYPE;
-	}
-
-	protected boolean hasPreview(FileVersion fileVersion) throws Exception {
-		return hasPreview(fileVersion, null);
-	}
-
-	@Override
-	protected boolean hasPreview(FileVersion fileVersion, String type)
-		throws Exception {
-
-		return _store.hasFile(
-			fileVersion.getCompanyId(), REPOSITORY_ID,
-			getPreviewFilePath(fileVersion, 1), Store.VERSION_DEFAULT);
-	}
-
-	protected void importPreviews(
-			PortletDataContext portletDataContext, FileEntry fileEntry,
-			FileEntry importedFileEntry, Element fileEntryElement)
-		throws Exception {
-
-		int previewFileCount = GetterUtil.getInteger(
-			fileEntryElement.attributeValue("bin-path-pdf-preview-count"));
-
-		for (int i = 0; i < previewFileCount; i++) {
-			importPreview(
-				portletDataContext, fileEntry, importedFileEntry,
-				fileEntryElement, "pdf", PREVIEW_TYPE, i);
-		}
 	}
 
 	private void _addDimensions(List<String> arguments, File file)
@@ -457,7 +246,7 @@ public class PDFProcessorImpl
 				return;
 			}
 
-			if (_hasImages(destinationFileVersion)) {
+			if (hasImage(destinationFileVersion)) {
 				return;
 			}
 
@@ -504,7 +293,7 @@ public class PDFProcessorImpl
 			}
 		}
 		finally {
-			_fileVersionIds.remove(destinationFileVersion.getFileVersionId());
+			fileVersionIds.remove(destinationFileVersion.getFileVersionId());
 		}
 	}
 
@@ -1011,16 +800,6 @@ public class PDFProcessorImpl
 		}
 	}
 
-	private boolean _hasImages(FileVersion fileVersion) throws Exception {
-		if (PropsValues.DL_FILE_ENTRY_PREVIEW_ENABLED &&
-			!hasPreview(fileVersion)) {
-
-			return false;
-		}
-
-		return hasThumbnails(fileVersion);
-	}
-
 	private boolean _isGeneratePreview(FileVersion fileVersion)
 		throws Exception {
 
@@ -1061,54 +840,14 @@ public class PDFProcessorImpl
 		return PDDocument.load(file);
 	}
 
-	private void _queueGeneration(
-		FileVersion sourceFileVersion, FileVersion destinationFileVersion) {
-
-		if (_fileVersionIds.contains(
-				destinationFileVersion.getFileVersionId())) {
-
-			return;
-		}
-
-		boolean generateImages = false;
-
-		String extension = destinationFileVersion.getExtension();
-
-		if (extension.equals("pdf")) {
-			generateImages = true;
-		}
-		else if (DocumentConversionUtil.isEnabled()) {
-			String[] conversions = DocumentConversionUtil.getConversions(
-				extension);
-
-			for (String conversion : conversions) {
-				if (conversion.equals("pdf")) {
-					generateImages = true;
-
-					break;
-				}
-			}
-		}
-
-		if (generateImages) {
-			_fileVersionIds.add(destinationFileVersion.getFileVersionId());
-
-			sendGenerationMessage(
-				DestinationNames.DOCUMENT_LIBRARY_PDF_PROCESSOR,
-				sourceFileVersion, destinationFileVersion);
-		}
-	}
-
 	private static final Log _log = LogFactoryUtil.getLog(
-		PDFProcessorImpl.class);
+		PDFProcessor.class);
 
 	@Reference
 	private BackgroundTaskManager _backgroundTaskManager;
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
-
-	private final List<Long> _fileVersionIds = new Vector<>();
 
 	@Reference
 	private FileVersionPreviewEventListener _fileVersionPreviewEventListener;
@@ -1126,9 +865,6 @@ public class PDFProcessorImpl
 
 	@Reference
 	private ProcessExecutor _processExecutor;
-
-	@Reference(target = "(default=true)")
-	private Store _store;
 
 	private static class LiferayPDFBoxProcessCallable
 		implements ProcessCallable<String> {
