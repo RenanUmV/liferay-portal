@@ -35,6 +35,7 @@ import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
+import com.liferay.search.experiences.rest.internal.contributor.UserSXPParameterContributor;
 import com.liferay.segments.SegmentsEntryRetriever;
 
 import java.beans.ExceptionListener;

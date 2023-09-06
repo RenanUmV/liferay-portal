@@ -14,6 +14,8 @@ import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
 import java.util.Map;
 
+import com.liferay.search.experiences.rest.internal.blueprint.blueprint.property.PropertyExpander;
+import com.liferay.search.experiences.rest.internal.blueprint.blueprint.property.PropertyResolver;
 import org.junit.Assert;
 import org.junit.ClassRule;
 import org.junit.Rule;

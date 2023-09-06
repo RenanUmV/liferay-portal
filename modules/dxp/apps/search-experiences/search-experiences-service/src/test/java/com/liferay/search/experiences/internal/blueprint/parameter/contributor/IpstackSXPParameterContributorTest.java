@@ -12,7 +12,8 @@ import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.webcache.WebCachePoolUtil;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
-import com.liferay.search.experiences.internal.configuration.IpstackConfiguration;
+import com.liferay.search.experiences.rest.internal.configuration.IpstackConfiguration;
+import com.liferay.search.experiences.rest.internal.contributor.IpstackSXPParameterContributor;
 
 import java.beans.ExceptionListener;
 

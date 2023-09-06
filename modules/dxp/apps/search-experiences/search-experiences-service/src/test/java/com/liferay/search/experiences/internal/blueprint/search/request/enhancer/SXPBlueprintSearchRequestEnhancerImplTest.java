@@ -49,8 +49,6 @@ import com.liferay.search.experiences.blueprint.exception.InvalidParameterExcept
 import com.liferay.search.experiences.blueprint.exception.InvalidQueryEntryException;
 import com.liferay.search.experiences.blueprint.exception.UnresolvedTemplateVariableException;
 import com.liferay.search.experiences.internal.blueprint.parameter.SXPParameterContributorProvider;
-import com.liferay.search.experiences.internal.blueprint.parameter.contributor.ContextSXPParameterContributor;
-import com.liferay.search.experiences.internal.blueprint.parameter.contributor.SXPParameterContributor;
 import com.liferay.search.experiences.rest.dto.v1_0.AdvancedConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.AggregationConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.Configuration;
@@ -65,6 +63,9 @@ import com.liferay.search.experiences.rest.dto.v1_0.SXPBlueprint;
 import com.liferay.search.experiences.rest.dto.v1_0.SXPElement;
 import com.liferay.search.experiences.rest.dto.v1_0.SortConfiguration;
 import com.liferay.search.experiences.rest.dto.v1_0.util.SXPBlueprintUtil;
+import com.liferay.search.experiences.rest.internal.contributor.ContextSXPParameterContributor;
+import com.liferay.search.experiences.rest.internal.contributor.SXPParameterContributor;
+import com.liferay.search.experiences.rest.internal.search.enhancer.SXPBlueprintSearchRequestEnhancerImpl;
 
 import java.io.InputStream;
 
