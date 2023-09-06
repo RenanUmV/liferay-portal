@@ -11,8 +11,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.BaseModelListener;
 import com.liferay.portal.kernel.model.ModelListener;
-import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiService;
-import com.liferay.portal.kernel.module.framework.service.IdentifiableOSGiServiceUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodKey;
 import com.liferay.portal.language.override.model.PLOEntry;
@@ -23,14 +21,8 @@ import org.osgi.service.component.annotations.Reference;
 /**
  * @author Drew Brokke
  */
-@Component(service = {ModelListener.class, IdentifiableOSGiService.class})
-public class PLOEntryModelListener
-	extends BaseModelListener<PLOEntry> implements IdentifiableOSGiService {
-
-	@Override
-	public String getOSGiServiceIdentifier() {
-		return PLOEntryModelListener.class.getName();
-	}
+@Component(service = ModelListener.class)
+public class PLOEntryModelListener extends BaseModelListener<PLOEntry> {
 
 	@Override
 	public void onAfterCreate(PLOEntry ploEntry) {
@@ -53,28 +45,16 @@ public class PLOEntryModelListener
 		_notifyCluster(MethodType.UPDATE, ploEntry);
 	}
 
-	private static void _onNotify(
-		MethodType methodType, String osgiServiceIdentifier,
-		PLOEntry ploEntry) {
+	private static void _notifyCluster(
+		MethodType methodType, PLOEntry ploEntry) {
 
-		PLOEntryModelListener ploEntryModelListener =
-			(PLOEntryModelListener)
-				IdentifiableOSGiServiceUtil.getIdentifiableOSGiService(
-					osgiServiceIdentifier);
-
-		ploEntryModelListener._updatePLOLanguageOverrideProvider(
-			methodType, ploEntry);
-	}
-
-	private void _notifyCluster(MethodType methodType, PLOEntry ploEntry) {
 		if (!_clusterExecutor.isEnabled()) {
 			return;
 		}
 
 		try {
 			MethodHandler methodHandler = new MethodHandler(
-				_onNotifyMethodKey, methodType, getOSGiServiceIdentifier(),
-				ploEntry);
+				_notifyClusterMethodKey, methodType, ploEntry);
 
 			ClusterRequest clusterRequest =
 				ClusterRequest.createMulticastRequest(methodHandler, true);
@@ -105,12 +85,12 @@ public class PLOEntryModelListener
 	private static final Log _log = LogFactoryUtil.getLog(
 		PLOEntryModelListener.class.getName());
 
-	private static final MethodKey _onNotifyMethodKey = new MethodKey(
-		PLOEntryModelListener.class, "_onNotify", MethodType.class,
-		String.class, PLOEntry.class);
-
 	@Reference
-	private ClusterExecutor _clusterExecutor;
+	private static ClusterExecutor _clusterExecutor;
+
+	private static final MethodKey _notifyClusterMethodKey = new MethodKey(
+		PLOEntryModelListener.class, "_notifyCluster", MethodType.class,
+		PLOEntry.class);
 
 	@Reference
 	private PLOOverrideResourceBundleManager _ploOverrideResourceBundleManager;
