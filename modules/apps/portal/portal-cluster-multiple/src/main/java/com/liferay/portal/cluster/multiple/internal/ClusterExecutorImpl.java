@@ -9,15 +9,19 @@ import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerList;
 import com.liferay.osgi.service.tracker.collections.list.ServiceTrackerListFactory;
 import com.liferay.petra.concurrent.ConcurrentReferenceValueHashMap;
 import com.liferay.petra.executor.PortalExecutorManager;
+import com.liferay.petra.lang.CentralizedThreadLocal;
 import com.liferay.petra.lang.HashUtil;
 import com.liferay.petra.memory.FinalizeManager;
 import com.liferay.petra.string.CharPool;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.cluster.multiple.configuration.ClusterExecutorConfiguration;
 import com.liferay.portal.configuration.metatype.bnd.util.ConfigurableUtil;
+import com.liferay.portal.kernel.cache.thread.local.Lifecycle;
+import com.liferay.portal.kernel.cache.thread.local.ThreadLocalCacheManager;
 import com.liferay.portal.kernel.cluster.Address;
 import com.liferay.portal.kernel.cluster.ClusterEvent;
 import com.liferay.portal.kernel.cluster.ClusterEventListener;
+import com.liferay.portal.kernel.cluster.ClusterEventType;
 import com.liferay.portal.kernel.cluster.ClusterException;
 import com.liferay.portal.kernel.cluster.ClusterExecutor;
 import com.liferay.portal.kernel.cluster.ClusterInvokeThreadLocal;
@@ -74,8 +78,7 @@ import org.osgi.service.component.annotations.Reference;
  */
 @Component(
 	configurationPid = "com.liferay.portal.cluster.multiple.configuration.ClusterExecutorConfiguration",
-	enabled = false,
-	service = {ClusterExecutor.class, ClusterExecutorImpl.class}
+	enabled = false, service = ClusterExecutor.class
 )
 public class ClusterExecutorImpl implements ClusterExecutor {
 
@@ -385,8 +388,7 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 		_executorService = _portalExecutorManager.getPortalExecutor(
 			ClusterExecutorImpl.class.getName());
 
-		ClusterRequestReceiver clusterReceiver = new ClusterRequestReceiver(
-			this);
+		ClusterRequestReceiver clusterReceiver = new ClusterRequestReceiver();
 
 		_clusterChannel = _clusterChannelFactory.createClusterChannel(
 			_executorService, channelLogicName, channelPropertiesLocation,
@@ -667,6 +669,94 @@ public class ClusterExecutorImpl implements ClusterExecutor {
 		@Override
 		public void portalServerInetSocketAddressConfigured(
 			InetSocketAddress inetSocketAddress, boolean secure) {
+		}
+
+	}
+
+	private class ClusterRequestReceiver extends BaseClusterReceiver {
+
+		public ClusterRequestReceiver() {
+			super(getExecutorService());
+		}
+
+		@Override
+		protected void doAddressesUpdated(
+			List<Address> oldAddresses, List<Address> newAddresses) {
+
+			List<Address> addedAddresses = new ArrayList<>(newAddresses);
+
+			addedAddresses.removeAll(oldAddresses);
+
+			if (!addedAddresses.isEmpty()) {
+				sendNotifyRequest();
+			}
+
+			List<Address> removedAddresses = new ArrayList<>(oldAddresses);
+
+			removedAddresses.removeAll(newAddresses);
+
+			if (!removedAddresses.isEmpty()) {
+				memberRemoved(removedAddresses);
+			}
+		}
+
+		@Override
+		protected void doCoordinatorAddressUpdated(
+			Address oldCoordinatorAddress, Address newCoordinatorAddress) {
+
+			if (oldCoordinatorAddress.equals(newCoordinatorAddress)) {
+				return;
+			}
+
+			fireClusterEvent(
+				new ClusterEvent(ClusterEventType.COORDINATOR_ADDRESS_UPDATE));
+		}
+
+		@Override
+		protected void doReceive(Object messagePayload, Address srcAddress) {
+			ClusterChannel clusterChannel = getClusterChannel();
+
+			if (srcAddress.equals(clusterChannel.getLocalAddress())) {
+				return;
+			}
+
+			try {
+				if (messagePayload instanceof ClusterRequest) {
+					ClusterRequest clusterRequest =
+						(ClusterRequest)messagePayload;
+
+					Serializable responsePayload = handleReceivedClusterRequest(
+						clusterRequest);
+
+					if (clusterRequest.isFireAndForget()) {
+						return;
+					}
+
+					try {
+						clusterChannel.sendUnicastMessage(
+							responsePayload, srcAddress);
+					}
+					catch (Throwable throwable) {
+						_log.error(
+							"Unable to send message " + responsePayload,
+							throwable);
+					}
+				}
+				else if (messagePayload instanceof ClusterNodeResponse) {
+					handleReceivedClusterNodeResponse(
+						(ClusterNodeResponse)messagePayload);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(
+						"Unable to process message content of type " +
+							messagePayload.getClass());
+				}
+			}
+			finally {
+				ThreadLocalCacheManager.clearAll(Lifecycle.REQUEST);
+
+				CentralizedThreadLocal.clearShortLivedThreadLocals();
+			}
 		}
 
 	}
