@@ -13,6 +13,7 @@ import com.liferay.sharepoint.rest.oauth2.service.SharepointOAuth2TokenEntryLoca
 
 import java.io.IOException;
 
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -44,8 +45,8 @@ public class SharepointRepositoryTokenStore implements TokenStore {
 			}
 
 			SharepointRepositoryTokenBroker sharepointRepositoryTokenBroker =
-				_sharepointRepositoryTokenBrokerFactory.create(
-					configurationPid);
+				SharepointRepositoryTokenBrokerFactory.create(
+					_configurationAdmin, configurationPid);
 
 			Token freshToken =
 				sharepointRepositoryTokenBroker.refreshAccessToken(token);
@@ -69,8 +70,8 @@ public class SharepointRepositoryTokenStore implements TokenStore {
 					fetchSharepointOAuth2TokenEntry(userId, configurationPid));
 
 			SharepointRepositoryTokenBroker sharepointRepositoryTokenBroker =
-				_sharepointRepositoryTokenBrokerFactory.create(
-					configurationPid);
+				SharepointRepositoryTokenBrokerFactory.create(
+					_configurationAdmin, configurationPid);
 
 			Token freshToken =
 				sharepointRepositoryTokenBroker.refreshAccessToken(token);
@@ -94,11 +95,10 @@ public class SharepointRepositoryTokenStore implements TokenStore {
 	}
 
 	@Reference
-	private SharepointOAuth2TokenEntryLocalService
-		_sharepointOAuth2TokenEntryLocalService;
+	private ConfigurationAdmin _configurationAdmin;
 
 	@Reference
-	private SharepointRepositoryTokenBrokerFactory
-		_sharepointRepositoryTokenBrokerFactory;
+	private SharepointOAuth2TokenEntryLocalService
+		_sharepointOAuth2TokenEntryLocalService;
 
 }

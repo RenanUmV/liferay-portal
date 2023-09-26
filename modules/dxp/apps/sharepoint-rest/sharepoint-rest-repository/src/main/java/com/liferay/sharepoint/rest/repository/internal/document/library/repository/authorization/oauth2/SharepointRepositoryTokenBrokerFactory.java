@@ -17,32 +17,34 @@ import java.util.NoSuchElementException;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Adolfo Pérez
  */
-@Component(service = SharepointRepositoryTokenBrokerFactory.class)
 public class SharepointRepositoryTokenBrokerFactory {
 
-	public SharepointRepositoryTokenBroker create(
+	public static SharepointRepositoryTokenBroker create(
+		ConfigurationAdmin configurationAdmin, String configurationPid) {
+
+		return create(
+			_getSharepointRepositoryConfiguration(
+				configurationAdmin, configurationPid));
+	}
+
+	public static SharepointRepositoryTokenBroker create(
 		SharepointRepositoryConfiguration sharepointRepositoryConfiguration) {
 
 		return new SharepointRepositoryTokenBroker(
 			sharepointRepositoryConfiguration);
 	}
 
-	public SharepointRepositoryTokenBroker create(String configurationPid) {
-		return create(_getSharepointRepositoryConfiguration(configurationPid));
-	}
-
-	private SharepointRepositoryConfiguration
-		_getSharepointRepositoryConfiguration(String configurationPid) {
+	private static SharepointRepositoryConfiguration
+		_getSharepointRepositoryConfiguration(
+			ConfigurationAdmin configurationAdmin, String configurationPid) {
 
 		try {
 			Configuration[] configurations =
-				_configurationAdmin.listConfigurations(
+				configurationAdmin.listConfigurations(
 					"(service.factoryPid=" +
 						SharepointRepositoryConfiguration.class.getName() +
 							")");
@@ -66,8 +68,5 @@ public class SharepointRepositoryTokenBrokerFactory {
 			throw new SystemException(exception);
 		}
 	}
-
-	@Reference
-	private ConfigurationAdmin _configurationAdmin;
 
 }
