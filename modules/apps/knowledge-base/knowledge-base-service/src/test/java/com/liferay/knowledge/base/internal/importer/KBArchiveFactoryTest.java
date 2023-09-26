@@ -11,7 +11,6 @@ import com.liferay.petra.string.StringPool;
 import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.settings.GroupServiceSettingsLocator;
 import com.liferay.portal.kernel.settings.SettingsLocator;
-import com.liferay.portal.kernel.test.ReflectionTestUtil;
 import com.liferay.portal.kernel.zip.ZipReader;
 import com.liferay.portal.test.rule.LiferayUnitTestRule;
 
@@ -40,10 +39,6 @@ public class KBArchiveFactoryTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ReflectionTestUtil.setFieldValue(
-			_kbArchiveFactory, "_configurationProvider",
-			_configurationProvider);
-
 		Mockito.doReturn(
 			_kbGroupServiceConfiguration
 		).when(
@@ -51,10 +46,6 @@ public class KBArchiveFactoryTest {
 		).getConfiguration(
 			Mockito.any(), Mockito.any(SettingsLocator.class)
 		);
-
-		ReflectionTestUtil.setFieldValue(
-			_kbArchiveFactory, "_configurationProvider",
-			_configurationProvider);
 
 		Mockito.when(
 			_configurationProvider.getConfiguration(
@@ -85,7 +76,7 @@ public class KBArchiveFactoryTest {
 		);
 
 		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			1234L, _zipReader);
+			_configurationProvider, 1234L, _zipReader);
 
 		Collection<KBArchive.Folder> folders = kbArchive.getFolders();
 
@@ -103,7 +94,7 @@ public class KBArchiveFactoryTest {
 		);
 
 		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			1234L, _zipReader);
+			_configurationProvider, 1234L, _zipReader);
 
 		Collection<KBArchive.Folder> folders = kbArchive.getFolders();
 
@@ -127,7 +118,7 @@ public class KBArchiveFactoryTest {
 		);
 
 		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			1234L, _zipReader);
+			_configurationProvider, 1234L, _zipReader);
 
 		Collection<KBArchive.Folder> folders = kbArchive.getFolders();
 
@@ -178,7 +169,8 @@ public class KBArchiveFactoryTest {
 			null
 		);
 
-		_kbArchiveFactory.createKBArchive(1234L, _zipReader);
+		_kbArchiveFactory.createKBArchive(
+			_configurationProvider, 1234L, _zipReader);
 	}
 
 	@Test
@@ -190,7 +182,7 @@ public class KBArchiveFactoryTest {
 		);
 
 		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			1234L, _zipReader);
+			_configurationProvider, 1234L, _zipReader);
 
 		Collection<KBArchive.Folder> folders = kbArchive.getFolders();
 
@@ -228,7 +220,7 @@ public class KBArchiveFactoryTest {
 		);
 
 		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			1234L, _zipReader);
+			_configurationProvider, 1234L, _zipReader);
 
 		Collection<KBArchive.Folder> folders = kbArchive.getFolders();
 

@@ -330,8 +330,8 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 				_portal, _dlURLHelper, _zipReaderFactory);
 
 			return kbArticleImporter.processZipFile(
-				userId, groupId, parentKbFolderId, prioritizeByNumericalPrefix,
-				inputStream, serviceContext);
+				_configurationProvider, userId, groupId, parentKbFolderId,
+				prioritizeByNumericalPrefix, inputStream, serviceContext);
 		}
 		finally {
 			WorkflowThreadLocal.setEnabled(workflowEnabled);
@@ -2616,8 +2616,7 @@ public class KBArticleLocalServiceImpl extends KBArticleLocalServiceBaseImpl {
 	@Reference
 	private IndexWriterHelper _indexWriterHelper;
 
-	@Reference
-	private KBArchiveFactory _kbArchiveFactory;
+	private final KBArchiveFactory _kbArchiveFactory = new KBArchiveFactory();
 
 	@Reference
 	private KBCommentPersistence _kbCommentPersistence;

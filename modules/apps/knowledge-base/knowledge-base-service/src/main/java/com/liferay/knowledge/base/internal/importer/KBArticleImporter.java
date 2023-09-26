@@ -16,6 +16,7 @@ import com.liferay.knowledge.base.model.KBArticle;
 import com.liferay.knowledge.base.service.KBArticleLocalService;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.configuration.module.configuration.ConfigurationProvider;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -57,7 +58,8 @@ public class KBArticleImporter {
 	}
 
 	public int processZipFile(
-			long userId, long groupId, long parentKBFolderId,
+			ConfigurationProvider configurationProvider, long userId,
+			long groupId, long parentKBFolderId,
 			boolean prioritizeByNumericalPrefix, InputStream inputStream,
 			ServiceContext serviceContext)
 		throws PortalException {
@@ -70,8 +72,9 @@ public class KBArticleImporter {
 			ZipReader zipReader = _zipReaderFactory.getZipReader(inputStream);
 
 			return _processKBArticleFiles(
-				userId, groupId, parentKBFolderId, prioritizeByNumericalPrefix,
-				zipReader, _getMetadata(zipReader), serviceContext);
+				configurationProvider, userId, groupId, parentKBFolderId,
+				prioritizeByNumericalPrefix, zipReader, _getMetadata(zipReader),
+				serviceContext);
 		}
 		catch (IOException ioException) {
 			throw new KBArticleImportException(ioException);
@@ -222,15 +225,16 @@ public class KBArticleImporter {
 	}
 
 	private int _processKBArticleFiles(
-			long userId, long groupId, long parentKBFolderId,
+			ConfigurationProvider configurationProvider, long userId,
+			long groupId, long parentKBFolderId,
 			boolean prioritizeByNumericalPrefix, ZipReader zipReader,
 			Map<String, String> metadata, ServiceContext serviceContext)
 		throws PortalException {
 
 		int importedKBArticlesCount = 0;
 
-		KBArchive kbArchive = _kbArchiveFactory.createKBArchive(
-			groupId, zipReader);
+		KBArchive kbArchive = KBArchiveFactory.createKBArchive(
+			configurationProvider, groupId, zipReader);
 
 		Map<KBArchive.File, KBArticle> introFileNameKBArticleMap =
 			new HashMap<>();

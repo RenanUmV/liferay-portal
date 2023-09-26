@@ -29,16 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-
 /**
  * @author Adolfo Pérez
  */
-@Component(service = KBArchiveFactory.class)
 public class KBArchiveFactory {
 
-	public KBArchive createKBArchive(long groupId, ZipReader zipReader)
+	public static KBArchive createKBArchive(
+			ConfigurationProvider configurationProvider, long groupId,
+			ZipReader zipReader)
 		throws PortalException {
 
 		List<String> entries = zipReader.getEntries();
@@ -49,7 +47,7 @@ public class KBArchiveFactory {
 		}
 
 		KBGroupServiceConfiguration kbGroupServiceConfiguration =
-			_configurationProvider.getConfiguration(
+			configurationProvider.getConfiguration(
 				KBGroupServiceConfiguration.class,
 				new GroupServiceSettingsLocator(
 					groupId, KBConstants.SERVICE_NAME));
@@ -87,9 +85,6 @@ public class KBArchiveFactory {
 
 		return new KBArchiveImpl(kbArchiveState.getFolders());
 	}
-
-	@Reference
-	private ConfigurationProvider _configurationProvider;
 
 	private static final class FileImpl implements KBArchive.File {
 
