@@ -41,7 +41,7 @@ import com.liferay.sharing.servlet.taglib.ui.SharingEntryDropdownItemContributor
 import com.liferay.sharing.util.comparator.SharingEntryModifiedDateComparator;
 import com.liferay.sharing.web.internal.constants.SharingPortletKeys;
 import com.liferay.sharing.web.internal.filter.SharedAssetsFilterItemRegistry;
-import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryDropdownItemContributorRegistry;
+import com.liferay.sharing.web.internal.servlet.taglib.ui.SharingEntryDropdownItemContributorRegistryUtil;
 
 import java.util.List;
 import java.util.Objects;
@@ -63,8 +63,6 @@ public class ViewSharedAssetsDisplayContext {
 		SharedAssetsFilterItemRegistry sharedAssetsFilterItemRegistry,
 		SharingConfigurationFactory sharingConfigurationFactory,
 		SharingDropdownItemFactory sharingDropdownItemFactory,
-		SharingEntryDropdownItemContributorRegistry
-			sharingEntryDropdownItemContributorRegistry,
 		Function<SharingEntry, SharingEntryInterpreter>
 			sharingEntryInterpreterFunction,
 		SharingEntryLocalService sharingEntryLocalService,
@@ -77,8 +75,6 @@ public class ViewSharedAssetsDisplayContext {
 		_sharedAssetsFilterItemRegistry = sharedAssetsFilterItemRegistry;
 		_sharingConfigurationFactory = sharingConfigurationFactory;
 		_sharingDropdownItemFactory = sharingDropdownItemFactory;
-		_sharingEntryDropdownItemContributorRegistry =
-			sharingEntryDropdownItemContributorRegistry;
 		_sharingEntryInterpreterFunction = sharingEntryInterpreterFunction;
 		_sharingEntryLocalService = sharingEntryLocalService;
 		_sharingPermission = sharingPermission;
@@ -211,7 +207,7 @@ public class ViewSharedAssetsDisplayContext {
 
 		SharingEntryDropdownItemContributor
 			sharingEntryDropdownItemContributor =
-				_sharingEntryDropdownItemContributorRegistry.
+				SharingEntryDropdownItemContributorRegistryUtil.
 					getSharingEntryMenuItemContributor(
 						sharingEntry.getClassNameId());
 
@@ -367,8 +363,6 @@ public class ViewSharedAssetsDisplayContext {
 		_sharedAssetsFilterItemRegistry;
 	private final SharingConfigurationFactory _sharingConfigurationFactory;
 	private final SharingDropdownItemFactory _sharingDropdownItemFactory;
-	private final SharingEntryDropdownItemContributorRegistry
-		_sharingEntryDropdownItemContributorRegistry;
 	private final Function<SharingEntry, SharingEntryInterpreter>
 		_sharingEntryInterpreterFunction;
 	private final SharingEntryLocalService _sharingEntryLocalService;
