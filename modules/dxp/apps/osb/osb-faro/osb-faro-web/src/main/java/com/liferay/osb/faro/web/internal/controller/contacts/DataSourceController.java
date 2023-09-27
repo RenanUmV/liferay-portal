@@ -57,7 +57,7 @@ import com.liferay.osb.faro.web.internal.search.FaroSearchContext;
 import com.liferay.osb.faro.web.internal.util.ContactsCSVHelper;
 import com.liferay.osb.faro.web.internal.util.FieldMappingUtil;
 import com.liferay.osb.faro.web.internal.util.OAuthUtil;
-import com.liferay.osb.faro.web.internal.util.TokenManager;
+import com.liferay.osb.faro.web.internal.util.TokenManagerUtil;
 import com.liferay.petra.function.transform.TransformUtil;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
@@ -71,11 +71,9 @@ import com.liferay.portal.kernel.model.Repository;
 import com.liferay.portal.kernel.model.RoleConstants;
 import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.portletfilerepository.PortletFileRepository;
-import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.util.Base64;
 import com.liferay.portal.kernel.util.HashMapBuilder;
 import com.liferay.portal.kernel.util.ListUtil;
-import com.liferay.portal.kernel.util.Portal;
 import com.liferay.portal.kernel.util.ResourceBundleUtil;
 import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
@@ -135,7 +133,7 @@ public class DataSourceController extends BaseFaroController {
 			@FormParam("token") String token)
 		throws Exception {
 
-		Long faroProjectId = _tokenManager.getFaroProjectId(token);
+		Long faroProjectId = TokenManagerUtil.getFaroProjectId(token);
 
 		if (faroProjectId == null) {
 			throw new FaroException(
@@ -147,7 +145,7 @@ public class DataSourceController extends BaseFaroController {
 
 		DataSource dataSource = null;
 
-		String dataSourceId = _tokenManager.getDataSourceId(token);
+		String dataSourceId = TokenManagerUtil.getDataSourceId(token);
 
 		if (dataSourceId == null) {
 			dataSource = contactsEngineClient.addDataSource(
@@ -155,7 +153,7 @@ public class DataSourceController extends BaseFaroController {
 				dataSourceName, portalURL, new LiferayProvider(), null,
 				DataSource.Status.ACTIVE.toString());
 
-			_tokenManager.setDataSourceId(dataSource.getId(), token);
+			TokenManagerUtil.setDataSourceId(dataSource.getId(), token);
 		}
 		else {
 			dataSource = contactsEngineClient.patchDataSource(
@@ -163,7 +161,7 @@ public class DataSourceController extends BaseFaroController {
 				null, portalURL, new LiferayProvider(), null,
 				DataSource.Status.ACTIVE.toString());
 
-			_tokenManager.clearToken(token);
+			TokenManagerUtil.clearToken(token);
 		}
 
 		TokenCredentials tokenCredentials =
@@ -312,7 +310,7 @@ public class DataSourceController extends BaseFaroController {
 
 		contactsEngineClient.deleteDataSource(faroProject, dataSource.getId());
 
-		_tokenManager.clearToken(
+		TokenManagerUtil.clearToken(
 			dataSource.getId(), faroProject.getFaroProjectId());
 
 		Provider provider = dataSource.getProvider();
@@ -393,13 +391,13 @@ public class DataSourceController extends BaseFaroController {
 		JSONObject jsonObject = _jsonFactory.createJSONObject(
 			new String(Base64.decode(token), StandardCharsets.UTF_8));
 
-		String dataSourceId = _tokenManager.getDataSourceId(
+		String dataSourceId = TokenManagerUtil.getDataSourceId(
 			jsonObject.getString("token"));
 
 		FaroProject faroProject =
 			faroProjectLocalService.getFaroProjectByGroupId(groupId);
 
-		_tokenManager.clearToken(dataSourceId, faroProject.getFaroProjectId());
+		TokenManagerUtil.clearToken(dataSourceId, faroProject.getFaroProjectId());
 
 		return dataSourceId;
 	}
@@ -1313,7 +1311,7 @@ public class DataSourceController extends BaseFaroController {
 		}
 
 		String json = JSONUtil.put(
-			"token", _tokenManager.getToken(dataSourceId, faroProjectId)
+			"token", TokenManagerUtil.getToken(dataSourceId, faroProjectId)
 		).put(
 			"url", url
 		).toString();
@@ -1568,9 +1566,6 @@ public class DataSourceController extends BaseFaroController {
 	private ClamAVScanner _clamAVScanner;
 
 	@Reference
-	private CompanyLocalService _companyLocalService;
-
-	@Reference
 	private ContactsCSVHelper _contactsCSVHelper;
 
 	@Reference
@@ -1586,12 +1581,6 @@ public class DataSourceController extends BaseFaroController {
 	private Language _language;
 
 	@Reference
-	private Portal _portal;
-
-	@Reference
 	private PortletFileRepository _portletFileRepository;
-
-	@Reference
-	private TokenManager _tokenManager;
 
 }
