@@ -15,23 +15,20 @@ import java.util.UUID;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import org.osgi.service.component.annotations.Component;
-
 /**
  * @author Geyson Silva
  */
-@Component(service = TokenManager.class)
-public class TokenManager {
+public class TokenManagerUtil {
 
-	public void clearToken(String token) {
+	public static void clearToken(String token) {
 		_tokens.removeValue(token);
 	}
 
-	public void clearToken(String dataSourceId, long faroProjectId) {
+	public static void clearToken(String dataSourceId, long faroProjectId) {
 		_tokens.remove(_getKey(dataSourceId, faroProjectId));
 	}
 
-	public String getDataSourceId(String token) {
+	public static String getDataSourceId(String token) {
 		String key = _tokens.getKey(token);
 
 		if (key == null) {
@@ -49,7 +46,7 @@ public class TokenManager {
 		return dataSourceId;
 	}
 
-	public Long getFaroProjectId(String token) {
+	public static Long getFaroProjectId(String token) {
 		String key = _tokens.getKey(token);
 
 		if (key == null) {
@@ -62,7 +59,7 @@ public class TokenManager {
 		return GetterUtil.getLong(parts[1]);
 	}
 
-	public String getToken(String dataSourceId, long faroProjectId) {
+	public static String getToken(String dataSourceId, long faroProjectId) {
 		return _tokens.computeIfAbsent(
 			_getKey(dataSourceId, faroProjectId),
 			key -> {
@@ -72,7 +69,7 @@ public class TokenManager {
 			});
 	}
 
-	public void setDataSourceId(String dataSourceId, String token) {
+	public static void setDataSourceId(String dataSourceId, String token) {
 		if (!_tokens.containsValue(token)) {
 			return;
 		}
@@ -84,7 +81,7 @@ public class TokenManager {
 		_tokens.put(_getKey(dataSourceId, faroProjectId), token);
 	}
 
-	private String _getKey(String dataSourceId, long faroProjectId) {
+	private static String _getKey(String dataSourceId, long faroProjectId) {
 		return dataSourceId + StringPool.POUND + faroProjectId;
 	}
 
