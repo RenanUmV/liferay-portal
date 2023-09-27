@@ -9,22 +9,25 @@ import com.liferay.portal.kernel.messaging.MessageListener;
 import com.liferay.portal.kernel.util.MapUtil;
 import com.liferay.push.notifications.constants.PushNotificationsDestinationNames;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceRegistration;
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
 
 /**
  * @author Bruno Farache
  */
-@Component(
-	enabled = false, service = ApplePushNotificationsMessagingConfigurator.class
-)
 public class ApplePushNotificationsMessagingConfigurator {
 
-	@Activate
-	protected void activate(BundleContext bundleContext) {
+	private static final ServiceRegistration<MessageListener>
+		_serviceRegistration;
+
+	static {
+		Bundle bundle = FrameworkUtil.getBundle(
+			ApplePushNotificationsMessagingConfigurator.class);
+
+		BundleContext bundleContext = bundle.getBundleContext();
+
 		_serviceRegistration = bundleContext.registerService(
 			MessageListener.class,
 			new ApplePushNotificationsResponseMessageListener(),
@@ -32,12 +35,5 @@ public class ApplePushNotificationsMessagingConfigurator {
 				"destination.name",
 				PushNotificationsDestinationNames.PUSH_NOTIFICATION_RESPONSE));
 	}
-
-	@Deactivate
-	protected void deactivate() {
-		_serviceRegistration.unregister();
-	}
-
-	private ServiceRegistration<MessageListener> _serviceRegistration;
 
 }
