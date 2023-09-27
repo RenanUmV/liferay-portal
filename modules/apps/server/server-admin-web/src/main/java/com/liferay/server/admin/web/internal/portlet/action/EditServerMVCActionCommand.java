@@ -611,7 +611,7 @@ public class EditServerMVCActionCommand
 			SessionMessages.add(actionRequest, "script", script);
 			SessionMessages.add(actionRequest, "output", output);
 
-			_serverScripting.execute(portletObjects, language, script);
+			ServerScripting.execute(portletObjects, language, script);
 
 			unsyncPrintWriter.flush();
 
@@ -959,9 +959,6 @@ public class EditServerMVCActionCommand
 
 	@Reference
 	private RoleMembershipPolicyFactory _roleMembershipPolicyFactory;
-
-	@Reference
-	private ServerScripting _serverScripting;
 
 	@Reference
 	private SingleVMPool _singleVMPool;
