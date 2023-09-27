@@ -28,7 +28,7 @@ public class IndexerRequestBufferTransactionLifecycleListener
 			IndexerRequestBuffer.remove();
 
 		if ((indexerRequestBuffer != null) && !indexerRequestBuffer.isEmpty()) {
-			_indexerRequestBufferExecutor.execute(indexerRequestBuffer);
+			IndexerRequestBufferExecutor.execute(indexerRequestBuffer);
 		}
 	}
 
@@ -52,8 +52,5 @@ public class IndexerRequestBufferTransactionLifecycleListener
 			indexerRequestBuffer.clear();
 		}
 	}
-
-	@Reference
-	private IndexerRequestBufferExecutor _indexerRequestBufferExecutor;
 
 }

@@ -49,7 +49,7 @@ public class IndexerRequestBufferOverflowHandler {
 			try {
 				BufferOverflowThreadLocal.setOverflowMode(true);
 
-				_indexerRequestBufferExecutor.execute(
+				IndexerRequestBufferExecutor.execute(
 					indexerRequestBuffer, numRequests);
 			}
 			finally {
@@ -90,9 +90,6 @@ public class IndexerRequestBufferOverflowHandler {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		IndexerRequestBufferOverflowHandler.class);
-
-	@Reference
-	private IndexerRequestBufferExecutor _indexerRequestBufferExecutor;
 
 	private volatile float _minimumBufferAvailabilityPercentage;
 
