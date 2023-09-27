@@ -15,16 +15,12 @@ import java.io.InputStream;
 
 import java.nio.charset.StandardCharsets;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
-
 /**
  * @author Matthew Kong
  */
-@Component(service = ClamAVScanner.class)
 public class ClamAVScanner {
 
-	public void scan(InputStream inputStream) {
+	public static void scan(InputStream inputStream) {
 		if (!FaroPropsValues.OSB_FARO_ANTIVIRUS_ENABLED) {
 			return;
 		}
@@ -43,8 +39,7 @@ public class ClamAVScanner {
 		}
 	}
 
-	@Activate
-	protected void activate() {
+	static {
 		if (FaroPropsValues.OSB_FARO_ANTIVIRUS_ENABLED) {
 			_clamAVClient = new ClamAVClient(
 				FaroPropsValues.OSB_FARO_CLAMAV_HOSTNAME,
@@ -53,13 +48,13 @@ public class ClamAVScanner {
 		}
 	}
 
-	private String _getVirusName(byte[] reply) {
+	private static String _getVirusName(byte[] reply) {
 		String virusName = new String(reply, StandardCharsets.US_ASCII);
 
 		return virusName.substring(
 			"stream: ".length(), virusName.length() - (" FOUND".length() + 1));
 	}
 
-	private ClamAVClient _clamAVClient;
+	private static ClamAVClient _clamAVClient;
 
 }

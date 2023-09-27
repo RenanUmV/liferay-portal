@@ -1217,7 +1217,7 @@ public class DataSourceController extends BaseFaroController {
 		throws Exception {
 
 		try (FileInputStream fileInputStream = new FileInputStream(file)) {
-			_clamAVScanner.scan(fileInputStream);
+			ClamAVScanner.scan(fileInputStream);
 		}
 
 		_contactsCSVHelper.validateCSV(file);
@@ -1561,9 +1561,6 @@ public class DataSourceController extends BaseFaroController {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		DataSourceController.class);
-
-	@Reference
-	private ClamAVScanner _clamAVScanner;
 
 	@Reference
 	private ContactsCSVHelper _contactsCSVHelper;
