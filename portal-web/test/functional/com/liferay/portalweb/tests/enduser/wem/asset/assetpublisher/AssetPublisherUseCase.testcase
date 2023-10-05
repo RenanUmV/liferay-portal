@@ -2383,17 +2383,20 @@ definition {
 
 			var script = '''
 import com.liferay.portal.kernel.module.util.SystemBundleUtil;
+import java.util.Iterator;
 
 try {
 	def bundleContext = SystemBundleUtil.getBundleContext();
 
-	def serviceReference = bundleContext.getServiceReference("com.liferay.asset.publisher.web.internal.scheduler.helper.AssetEntriesCheckerHelper");
+	def serviceReferences = bundleContext.getServiceReferences("com.liferay.portal.kernel.scheduler.SchedulerJobConfiguration", "(component.name=com.liferay.asset.publisher.web.internal.scheduler.CheckAssetEntrySchedulerJobConfiguration)");
 
-	def assetEntriesCheckerHelper = bundleContext.getService(serviceReference);
+    Iterator<ServiceReference<?>> iterator = Arrays.stream(portletDataHandlerReferences).iterator();
 
-	def checkEntriesMethod = assetEntriesCheckerHelper.getClass().getMethod("checkAssetEntries");
+	def checkAssetEntrySchedulerJobConfiguration = (CheckAssetEntrySchedulerJobConfiguration) bundleContext.getService(iterator.next());
 
-	checkEntriesMethod.invoke(assetEntriesCheckerHelper);
+	def checkEntriesMethod = checkAssetEntrySchedulerJobConfiguration.getClass().getMethod("_checkAssetEntries");
+
+	checkEntriesMethod.invoke(checkAssetEntrySchedulerJobConfiguration);
 }
 catch (Exception e) {
 	e.printStackTrace(out);

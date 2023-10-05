@@ -65,7 +65,7 @@ import org.osgi.framework.FrameworkUtil;
  * @author Roberto Díaz
  */
 @RunWith(Arquillian.class)
-public class AssetEntriesCheckerHelperTest {
+public class CheckAssetEntrySchedulerJobConfigurationTest {
 
 	@ClassRule
 	@Rule
@@ -98,7 +98,7 @@ public class AssetEntriesCheckerHelperTest {
 		_assertAssetEntries(
 			Arrays.asList(assetEntry1, assetEntry2),
 			ReflectionTestUtil.invoke(
-				_assetEntriesCheckerHelper, "_getAssetEntries",
+				_checkAssetEntrySchedulerJobConfiguration, "_getAssetEntries",
 				new Class<?>[] {PortletPreferences.class, Layout.class},
 				LayoutTestUtil.getPortletPreferences(_layout, _portletId),
 				_layout));
@@ -113,7 +113,7 @@ public class AssetEntriesCheckerHelperTest {
 		_assertAssetEntries(
 			Arrays.asList(_addAssetEntry(), _addAssetEntry(), _addAssetEntry()),
 			ReflectionTestUtil.invoke(
-				_assetEntriesCheckerHelper, "_getAssetEntries",
+				_checkAssetEntrySchedulerJobConfiguration, "_getAssetEntries",
 				new Class<?>[] {PortletPreferences.class, Layout.class},
 				LayoutTestUtil.getPortletPreferences(_layout, _portletId),
 				_layout));
@@ -134,7 +134,7 @@ public class AssetEntriesCheckerHelperTest {
 		_assertAssetEntries(
 			Arrays.asList(assetEntry1, assetEntry2, assetEntry3, assetEntry4),
 			ReflectionTestUtil.invoke(
-				_assetEntriesCheckerHelper, "_getAssetEntries",
+				_checkAssetEntrySchedulerJobConfiguration, "_getAssetEntries",
 				new Class<?>[] {PortletPreferences.class, Layout.class},
 				LayoutTestUtil.getPortletPreferences(_layout, _portletId),
 				_layout));
@@ -247,7 +247,7 @@ public class AssetEntriesCheckerHelperTest {
 
 	private void _setUpAssetEntriesCheckerHelper() throws Exception {
 		Bundle bundle = FrameworkUtil.getBundle(
-			AssetEntriesCheckerHelperTest.class);
+			CheckAssetEntrySchedulerJobConfigurationTest.class);
 
 		Bundle assetPublisherWebBundle = BundleUtil.getBundle(
 			bundle.getBundleContext(), "com.liferay.asset.publisher.web");
@@ -257,43 +257,42 @@ public class AssetEntriesCheckerHelperTest {
 			assetPublisherWebBundle);
 
 		Class<?> clazz = assetPublisherWebBundle.loadClass(
-			"com.liferay.asset.publisher.web.internal.scheduler.helper." +
-				"AssetEntriesCheckerHelper");
+			"com.liferay.asset.publisher.web.internal.scheduler." +
+				"CheckAssetEntrySchedulerJobConfiguration");
 
 		Constructor<?> constructor = clazz.getConstructor();
 
-		_assetEntriesCheckerHelper = constructor.newInstance();
+		_checkAssetEntrySchedulerJobConfiguration = constructor.newInstance();
 
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_assetEntryLocalService",
-			_assetEntryLocalService);
+			_checkAssetEntrySchedulerJobConfiguration,
+			"_assetEntryLocalService", _assetEntryLocalService);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_assetHelper", _assetHelper);
+			_checkAssetEntrySchedulerJobConfiguration, "_assetHelper",
+			_assetHelper);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_assetListAssetEntryProvider",
-			_assetListAssetEntryProvider);
+			_checkAssetEntrySchedulerJobConfiguration,
+			"_assetListAssetEntryProvider", _assetListAssetEntryProvider);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_assetListEntryLocalService",
-			_assetListEntryLocalService);
+			_checkAssetEntrySchedulerJobConfiguration,
+			"_assetListEntryLocalService", _assetListEntryLocalService);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper,
+			_checkAssetEntrySchedulerJobConfiguration,
 			"_assetListEntrySegmentsEntryRelLocalService",
 			_assetListEntrySegmentsEntryRelLocalService);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_assetPublisherHelper",
+			_checkAssetEntrySchedulerJobConfiguration, "_assetPublisherHelper",
 			_assetPublisherHelper);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_configurationProvider",
+			_checkAssetEntrySchedulerJobConfiguration, "_configurationProvider",
 			_configurationProvider);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_groupLocalService",
+			_checkAssetEntrySchedulerJobConfiguration, "_groupLocalService",
 			_groupLocalService);
 		ReflectionTestUtil.setFieldValue(
-			_assetEntriesCheckerHelper, "_segmentsConfigurationProvider",
-			_segmentsConfigurationProvider);
+			_checkAssetEntrySchedulerJobConfiguration,
+			"_segmentsConfigurationProvider", _segmentsConfigurationProvider);
 	}
-
-	private Object _assetEntriesCheckerHelper;
 
 	@Inject
 	private AssetEntryLocalService _assetEntryLocalService;
@@ -316,6 +315,8 @@ public class AssetEntriesCheckerHelperTest {
 
 	@Inject
 	private BlogsEntryLocalService _blogsEntryLocalService;
+
+	private Object _checkAssetEntrySchedulerJobConfiguration;
 
 	@Inject
 	private ConfigurationProvider _configurationProvider;
