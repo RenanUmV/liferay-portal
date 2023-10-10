@@ -106,9 +106,9 @@ public class CategoryResourceImpl extends BaseCategoryResourceImpl {
 			cpDefinition.getCPDefinitionId());
 
 		return Page.of(
-			_toProductCategories(assetCategories, contextAcceptLanguage.getPreferredLocale()), pagination,
-			totalItems);
-
+			_toProductCategories(
+				assetCategories, contextAcceptLanguage.getPreferredLocale()),
+			pagination, totalItems);
 	}
 
 	@Override
