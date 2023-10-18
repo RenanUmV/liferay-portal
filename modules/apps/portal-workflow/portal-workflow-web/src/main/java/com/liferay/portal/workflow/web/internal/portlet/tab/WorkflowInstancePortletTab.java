@@ -29,7 +29,6 @@ import com.liferay.portal.workflow.web.internal.display.context.MyWorkflowInstan
 import com.liferay.portal.workflow.web.internal.display.context.MyWorkflowInstanceViewDisplayContext;
 import com.liferay.portal.workflow.web.internal.display.context.WorkflowInstanceEditDisplayContext;
 import com.liferay.portal.workflow.web.internal.display.context.WorkflowInstanceViewDisplayContext;
-import com.liferay.portal.workflow.web.internal.request.preprocessor.helper.WorkflowPreprocessorHelper;
 
 import java.util.Map;
 import java.util.Objects;
@@ -42,6 +41,7 @@ import javax.portlet.RenderResponse;
 
 import javax.servlet.ServletContext;
 
+import com.liferay.portal.workflow.web.internal.request.preprocessor.util.WorkflowPreprocessorUtil;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -86,7 +86,7 @@ public class WorkflowInstancePortletTab extends BaseWorkflowPortletTab {
 			actionRequest, ActionRequest.ACTION_NAME);
 
 		if (StringUtil.equalsIgnoreCase(actionName, "invokeTaglibDiscussion")) {
-			workflowPreprocessorHelper.hideDefaultSuccessMessage(actionRequest);
+			WorkflowPreprocessorUtil.hideDefaultSuccessMessage(actionRequest);
 		}
 	}
 
@@ -101,12 +101,12 @@ public class WorkflowInstancePortletTab extends BaseWorkflowPortletTab {
 			_setWorkflowInstanceRenderRequestAttribute(renderRequest);
 		}
 		catch (Exception exception) {
-			if (workflowPreprocessorHelper.isSessionErrorException(exception)) {
+			if (WorkflowPreprocessorUtil.isSessionErrorException(exception)) {
 				if (_log.isWarnEnabled()) {
 					_log.warn(exception);
 				}
 
-				workflowPreprocessorHelper.hideDefaultErrorMessage(
+				WorkflowPreprocessorUtil.hideDefaultErrorMessage(
 					renderRequest);
 
 				SessionErrors.add(renderRequest, exception.getClass());
@@ -145,9 +145,6 @@ public class WorkflowInstancePortletTab extends BaseWorkflowPortletTab {
 
 	@Reference
 	protected WorkflowLogManager workflowLogManager;
-
-	@Reference
-	protected WorkflowPreprocessorHelper workflowPreprocessorHelper;
 
 	private void _setWorkflowInstanceDisplayContextRenderRequestAttribute(
 			RenderRequest renderRequest, RenderResponse renderResponse)
