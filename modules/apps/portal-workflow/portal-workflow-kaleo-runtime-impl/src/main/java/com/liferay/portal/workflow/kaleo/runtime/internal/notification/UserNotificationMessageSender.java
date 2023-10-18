@@ -19,7 +19,7 @@ import com.liferay.portal.kernel.service.UserNotificationEventLocalService;
 import com.liferay.portal.kernel.util.PortletKeys;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
-import com.liferay.portal.workflow.kaleo.runtime.internal.helper.NotificationMessageHelper;
+import com.liferay.portal.workflow.kaleo.runtime.internal.util.NotificationMessageUtil;
 import com.liferay.portal.workflow.kaleo.runtime.notification.BaseNotificationSender;
 import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationRecipient;
 import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationSender;
@@ -51,7 +51,7 @@ public class UserNotificationMessageSender
 		throws Exception {
 
 		JSONObject jsonObject =
-			_notificationMessageHelper.createMessageJSONObject(
+			NotificationMessageUtil.createMessageJSONObject(
 				notificationMessage, executionContext);
 
 		for (Map.Entry<NotificationReceptionType, Set<NotificationRecipient>>
@@ -92,9 +92,6 @@ public class UserNotificationMessageSender
 		target = "(model.class.name=com.liferay.change.tracking.model.CTCollection)"
 	)
 	private ModelResourcePermission<CTCollection> _modelResourcePermission;
-
-	@Reference
-	private NotificationMessageHelper _notificationMessageHelper;
 
 	@Reference
 	private PermissionCheckerFactory _permissionCheckerFactory;

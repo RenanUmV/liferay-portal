@@ -3,10 +3,10 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.portal.workflow.kaleo.runtime.internal.helper;
+package com.liferay.portal.workflow.kaleo.runtime.internal.util;
 
 import com.liferay.portal.kernel.exception.PortalException;
-import com.liferay.portal.kernel.json.JSONFactory;
+import com.liferay.portal.kernel.json.JSONFactoryUtil;
 import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -20,19 +20,17 @@ import java.io.Serializable;
 
 import java.util.Map;
 
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * @author Marcellus Tavares
  */
-@Component(service = NotificationMessageHelper.class)
-public class NotificationMessageHelper {
+public class NotificationMessageUtil {
 
-	public JSONObject createMessageJSONObject(
+	public static JSONObject createMessageJSONObject(
 		String notificationMessage, ExecutionContext executionContext) {
 
-		JSONObject jsonObject = jsonFactory.createJSONObject();
+		JSONObject jsonObject = JSONFactoryUtil.createJSONObject();
 
 		Map<String, Serializable> workflowContext =
 			executionContext.getWorkflowContext();
@@ -93,10 +91,7 @@ public class NotificationMessageHelper {
 		return jsonObject;
 	}
 
-	@Reference
-	protected JSONFactory jsonFactory;
-
-	private long _getUserId(
+	private static long _getUserId(
 		ExecutionContext executionContext,
 		KaleoInstanceToken kaleoInstanceToken) {
 
@@ -119,6 +114,6 @@ public class NotificationMessageHelper {
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		NotificationMessageHelper.class);
+		NotificationMessageUtil.class);
 
 }

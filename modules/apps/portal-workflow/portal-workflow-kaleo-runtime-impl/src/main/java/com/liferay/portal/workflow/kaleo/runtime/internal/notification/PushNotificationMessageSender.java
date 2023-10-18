@@ -14,7 +14,7 @@ import com.liferay.portal.kernel.messaging.MessageBus;
 import com.liferay.portal.kernel.model.UserNotificationDeliveryConstants;
 import com.liferay.portal.workflow.kaleo.definition.NotificationReceptionType;
 import com.liferay.portal.workflow.kaleo.runtime.ExecutionContext;
-import com.liferay.portal.workflow.kaleo.runtime.internal.helper.NotificationMessageHelper;
+import com.liferay.portal.workflow.kaleo.runtime.internal.util.NotificationMessageUtil;
 import com.liferay.portal.workflow.kaleo.runtime.notification.BaseNotificationSender;
 import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationRecipient;
 import com.liferay.portal.workflow.kaleo.runtime.notification.NotificationSender;
@@ -84,9 +84,6 @@ public class PushNotificationMessageSender
 	@Reference
 	protected MessageBus messageBus;
 
-	@Reference
-	protected NotificationMessageHelper notificationMessageHelper;
-
 	private Message _createMessage(
 			List<NotificationRecipient> notificationRecipients,
 			String notificationMessage, ExecutionContext executionContext)
@@ -108,7 +105,7 @@ public class PushNotificationMessageSender
 		throws Exception {
 
 		JSONObject jsonObject =
-			notificationMessageHelper.createMessageJSONObject(
+			NotificationMessageUtil.createMessageJSONObject(
 				notificationMessage, executionContext);
 
 		jsonObject.put(
