@@ -15,6 +15,7 @@ import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
 import com.liferay.search.experiences.configuration.SemanticSearchConfiguration;
 import com.liferay.search.experiences.configuration.SemanticSearchConfigurationProvider;
+import com.liferay.search.experiences.contributor.SXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.DoubleArraySXPParameter;
 import com.liferay.search.experiences.internal.blueprint.parameter.IntegerSXPParameter;
 import com.liferay.search.experiences.internal.web.cache.TextEmbeddingProviderWebCacheItem;

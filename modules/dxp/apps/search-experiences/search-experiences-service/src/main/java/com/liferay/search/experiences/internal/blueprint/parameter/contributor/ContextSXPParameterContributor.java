@@ -16,6 +16,7 @@ import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.search.experiences.blueprint.parameter.SXPParameter;
 import com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition;
+import com.liferay.search.experiences.contributor.SXPParameterContributor;
 import com.liferay.search.experiences.internal.blueprint.parameter.BooleanSXPParameter;
 import com.liferay.search.experiences.internal.blueprint.parameter.LongArraySXPParameter;
 import com.liferay.search.experiences.internal.blueprint.parameter.LongSXPParameter;
