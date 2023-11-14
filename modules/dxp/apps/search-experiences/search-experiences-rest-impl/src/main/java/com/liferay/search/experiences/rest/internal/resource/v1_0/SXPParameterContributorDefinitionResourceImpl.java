@@ -13,14 +13,14 @@ import com.liferay.search.experiences.rest.contributor.SXPParameterContributorRe
 import com.liferay.search.experiences.rest.dto.v1_0.SXPParameterContributorDefinition;
 import com.liferay.search.experiences.rest.resource.v1_0.SXPParameterContributorDefinitionResource;
 
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ServiceScope;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 
 /**
  * @author Brian Wing Shun Chan
@@ -41,9 +41,9 @@ public class SXPParameterContributorDefinitionResourceImpl
 
 		return Page.of(
 			transform(
-					_getSXPParameterContributorDefinitions(
-						contextCompany.getCompanyId(),
-						contextAcceptLanguage.getPreferredLocale()),
+				_getSXPParameterContributorDefinitions(
+					contextCompany.getCompanyId(),
+					contextAcceptLanguage.getPreferredLocale()),
 				sxpParameterContributorDefinition ->
 					new SXPParameterContributorDefinition() {
 						{
@@ -61,22 +61,27 @@ public class SXPParameterContributorDefinitionResourceImpl
 					}));
 	}
 
-	private List<com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition>
-	_getSXPParameterContributorDefinitions(long companyId, Locale locale) {
+	private List
+		<com.liferay.search.experiences.blueprint.parameter.contributor.
+			SXPParameterContributorDefinition>
+				_getSXPParameterContributorDefinitions(
+					long companyId, Locale locale) {
 
 		if (ArrayUtil.isEmpty(
-			_sxpParameterContributorRegistry.
-				getSxpParameterContributors())) {
+				_sxpParameterContributorRegistry.
+					getSxpParameterContributors())) {
 
 			return Collections.emptyList();
 		}
 
-		List<com.liferay.search.experiences.blueprint.parameter.contributor.SXPParameterContributorDefinition>
-			sxpParameterContributorDefinitions = new ArrayList<>();
+		List
+			<com.liferay.search.experiences.blueprint.parameter.contributor.
+				SXPParameterContributorDefinition>
+					sxpParameterContributorDefinitions = new ArrayList<>();
 
 		for (SXPParameterContributor sxpParameterContributor :
-			_sxpParameterContributorRegistry.
-				getSxpParameterContributors()) {
+				_sxpParameterContributorRegistry.
+					getSxpParameterContributors()) {
 
 			sxpParameterContributorDefinitions.addAll(
 				sxpParameterContributor.getSXPParameterContributorDefinitions(
@@ -87,10 +92,9 @@ public class SXPParameterContributorDefinitionResourceImpl
 	}
 
 	@Reference
-	private SXPParameterContributorRegistry _sxpParameterContributorRegistry;
-
-	@Reference
 	private Language _language;
 
+	@Reference
+	private SXPParameterContributorRegistry _sxpParameterContributorRegistry;
 
 }
