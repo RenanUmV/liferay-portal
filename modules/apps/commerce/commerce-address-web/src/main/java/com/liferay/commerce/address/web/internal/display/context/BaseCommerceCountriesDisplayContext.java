@@ -29,14 +29,12 @@ import javax.portlet.RenderResponse;
 public abstract class BaseCommerceCountriesDisplayContext<T> {
 
 	public BaseCommerceCountriesDisplayContext(
-		CountryService countryService,
 		PortletResourcePermission portletResourcePermission,
 		RenderRequest renderRequest, RenderResponse renderResponse) {
 
 		this.renderRequest = renderRequest;
 		this.renderResponse = renderResponse;
 
-		_countryService = countryService;
 		_portletResourcePermission = portletResourcePermission;
 
 		_defaultOrderByCol = "priority";
@@ -143,7 +141,6 @@ public abstract class BaseCommerceCountriesDisplayContext<T> {
 	protected SearchContainer<T> searchContainer;
 
 	private Country _getCountry(RenderRequest renderRequest) {
-
 		long countryId = ParamUtil.getLong(renderRequest, "countryId");
 
 		if (countryId > 0) {
@@ -154,7 +151,7 @@ public abstract class BaseCommerceCountriesDisplayContext<T> {
 	}
 
 	private Country _country;
-	private final CountryService _countryService;
+	private CountryService _countryService;
 	private String _defaultOrderByCol;
 	private String _defaultOrderByType;
 	private final PortletResourcePermission _portletResourcePermission;
