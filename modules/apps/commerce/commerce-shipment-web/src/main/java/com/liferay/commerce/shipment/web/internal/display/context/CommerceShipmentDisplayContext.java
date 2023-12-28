@@ -25,9 +25,10 @@ import com.liferay.commerce.product.service.CommerceChannelService;
 import com.liferay.commerce.service.CommerceAddressLocalService;
 import com.liferay.commerce.service.CommerceOrderItemService;
 import com.liferay.commerce.service.CommerceOrderLocalService;
+import com.liferay.commerce.service.CommerceShipmentItemLocalService;
 import com.liferay.commerce.service.CommerceShipmentItemService;
+import com.liferay.commerce.service.CommerceShipmentLocalService;
 import com.liferay.commerce.service.CommerceShippingMethodService;
-import com.liferay.commerce.shipment.web.internal.portlet.action.helper.ActionHelper;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.petra.function.transform.TransformUtil;
@@ -62,7 +63,6 @@ import java.util.Locale;
 
 import javax.portlet.PortletRequest;
 import javax.portlet.PortletURL;
-import javax.portlet.WindowStateException;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -74,7 +74,8 @@ public class CommerceShipmentDisplayContext
 	extends BaseCommerceShipmentDisplayContext<CommerceShipment> {
 
 	public CommerceShipmentDisplayContext(
-		ActionHelper actionHelper,
+		CommerceShipmentItemLocalService commerceShipmentItemLocalService,
+		CommerceShipmentLocalService commerceShipmentLocalService,
 		CommerceAddressFormatter commerceAddressFormatter,
 		CommerceAddressLocalService commerceAddressLocalService,
 		CommerceChannelService commerceChannelService,
@@ -86,7 +87,9 @@ public class CommerceShipmentDisplayContext
 		PortletResourcePermission portletResourcePermission,
 		RegionService regionService) {
 
-		super(actionHelper, httpServletRequest, portletResourcePermission);
+		super(
+			commerceShipmentItemLocalService, commerceShipmentLocalService,
+			httpServletRequest, portletResourcePermission);
 
 		_commerceAddressFormatter = commerceAddressFormatter;
 		_commerceAddressLocalService = commerceAddressLocalService;
@@ -127,7 +130,7 @@ public class CommerceShipmentDisplayContext
 		return sb.toString();
 	}
 
-	public String getCommerceChannelName() throws PortalException {
+	public String getCommerceChannelName() throws Exception {
 		CommerceShipment commerceShipment = getCommerceShipment();
 
 		CommerceChannel commerceChannel =
@@ -167,9 +170,9 @@ public class CommerceShipmentDisplayContext
 
 			return commerceShippingMethod.getName(locale);
 		}
-		catch (PortalException portalException) {
+		catch (Exception exception) {
 			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+				_log.debug(exception);
 			}
 		}
 
@@ -177,7 +180,7 @@ public class CommerceShipmentDisplayContext
 	}
 
 	public List<CommerceShippingMethod> getCommerceShippingMethods()
-		throws PortalException {
+		throws Exception {
 
 		CommerceShipment commerceShipment = getCommerceShipment();
 
@@ -199,7 +202,7 @@ public class CommerceShipmentDisplayContext
 			cpRequestHelper.getCompanyId(), true);
 	}
 
-	public String getDescriptiveShippingAddress() throws PortalException {
+	public String getDescriptiveShippingAddress() throws Exception {
 		CommerceShipment commerceShipment = getCommerceShipment();
 
 		if (commerceShipment.getCommerceAddressId() == 0) {
@@ -216,7 +219,7 @@ public class CommerceShipmentDisplayContext
 			commerceAddress, true);
 	}
 
-	public String getFDSName() throws PortalException {
+	public String getFDSName() throws Exception {
 		CommerceShipment commerceShipment = getCommerceShipment();
 
 		if (commerceShipment.getStatus() >
@@ -228,9 +231,7 @@ public class CommerceShipmentDisplayContext
 		return CommerceShipmentFDSNames.PROCESSING_SHIPMENT_ITEMS;
 	}
 
-	public List<HeaderActionModel> getHeaderActionModels()
-		throws PortalException {
-
+	public List<HeaderActionModel> getHeaderActionModels() throws Exception {
 		List<HeaderActionModel> headerActionModels = new ArrayList<>();
 
 		CommerceShipment commerceShipment = getCommerceShipment();
@@ -307,7 +308,7 @@ public class CommerceShipmentDisplayContext
 	}
 
 	@Override
-	public PortletURL getPortletURL() throws PortalException {
+	public PortletURL getPortletURL() throws Exception {
 		return PortletURLBuilder.create(
 			super.getPortletURL()
 		).setNavigation(
@@ -319,9 +320,7 @@ public class CommerceShipmentDisplayContext
 		return _regionService.getRegions(countryId, true);
 	}
 
-	public List<DropdownItem> getShipmentItemBulkActions()
-		throws PortalException {
-
+	public List<DropdownItem> getShipmentItemBulkActions() throws Exception {
 		List<DropdownItem> dropdownItems = new ArrayList<>();
 
 		CommerceShipment commerceShipment = getCommerceShipment();
@@ -336,9 +335,7 @@ public class CommerceShipmentDisplayContext
 		return dropdownItems;
 	}
 
-	public CreationMenu getShipmentItemCreationMenu()
-		throws PortalException, WindowStateException {
-
+	public CreationMenu getShipmentItemCreationMenu() throws Exception {
 		CreationMenu creationMenu = new CreationMenu();
 
 		CommerceShipment commerceShipment = getCommerceShipment();
@@ -373,7 +370,7 @@ public class CommerceShipmentDisplayContext
 		return creationMenu;
 	}
 
-	public List<StepModel> getShipmentSteps() throws PortalException {
+	public List<StepModel> getShipmentSteps() throws Exception {
 		CommerceShipment commerceShipment = getCommerceShipment();
 
 		List<StepModel> steps = new ArrayList<>();
@@ -410,14 +407,14 @@ public class CommerceShipmentDisplayContext
 		return steps;
 	}
 
-	public CommerceAddress getShippingAddress() throws PortalException {
+	public CommerceAddress getShippingAddress() throws Exception {
 		CommerceShipment commerceShipment = getCommerceShipment();
 
 		return _commerceAddressLocalService.fetchCommerceAddress(
 			commerceShipment.getCommerceAddressId());
 	}
 
-	public boolean hasMultipleShippingMethods() throws PortalException {
+	public boolean hasMultipleShippingMethods() throws Exception {
 		long commerceShippingMethodId = 0;
 
 		List<CommerceShipmentItem> commerceShipmentItems =
